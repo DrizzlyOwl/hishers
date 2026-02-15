@@ -235,6 +235,26 @@
                 Mortgage Required: <span id="mortgageRequiredDisplay" class="fw-bold">£0</span>
             </div>
 
+            <div class="purchase-costs-box" style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(44, 62, 99, 0.03); border-radius: 0.75rem; border: 1px dashed var(--color-border);">
+                <h4 style="margin-top: 0;">Estimated Purchase Costs</h4>
+                <div class="form-group">
+                    <label class="form-label">Estimated Stamp Duty (SDLT)</label>
+                    <div class="input-group">
+                        <span class="input-addon">£</span>
+                        <input type="text" id="sdlt-estimate" class="input-control" readonly tabindex="-1">
+                    </div>
+                    <p class="help-text">Standard residential rate estimate.</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Estimated Legal Fees</label>
+                    <div class="input-group">
+                        <span class="input-addon">£</span>
+                        <input type="text" id="legal-fees-estimate" class="input-control" readonly tabindex="-1">
+                    </div>
+                    <p class="help-text">Includes conveyancing, searches, and bank transfer fees.</p>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label class="form-label" for="mortgageInterestRate">Annual Interest Rate (APR %)</label>
                 <div class="input-group">
@@ -597,7 +617,7 @@
 </main>
 
 <footer>
-    Vibe coded by Ash Davies (DrizzlyOwl) and Gemini
+    Vibe coded by Ash Davies (DrizzlyOwl) and Gemini | <a href="README.md" target="_blank" style="color: inherit; text-decoration: underline;">Project Info</a>
 </footer>
 
 <script src="app.js"></script>

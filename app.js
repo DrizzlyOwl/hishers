@@ -271,6 +271,34 @@ document.addEventListener('DOMContentLoaded', () => {
         appData.totalEquity = propertyPrice * (appData.depositPercentage / 100);
         appData.mortgageRequired = propertyPrice - appData.totalEquity;
         
+        // SDLT Calculation (Standard Residential UK Rates as of 2026)
+        // Rates: 0% up to £125k, 2% up to £250k, 5% up to £925k, 10% up to £1.5m, 12% above.
+        let sdlt = 0;
+        const p = propertyPrice;
+        if (p > 1500000) {
+            sdlt = (125000 * 0.02) + (675000 * 0.05) + (575000 * 0.10) + ((p - 1500000) * 0.12);
+        } else if (p > 925000) {
+            sdlt = (125000 * 0.02) + (675000 * 0.05) + ((p - 925000) * 0.10);
+        } else if (p > 250000) {
+            sdlt = (125000 * 0.02) + ((p - 250000) * 0.05);
+        } else if (p > 125000) {
+            sdlt = (p - 125000) * 0.02;
+        } else {
+            sdlt = 0;
+        }
+
+        // Legal Fees Estimate
+        let legalFees = 1200; // Base fee
+        if (p > 500000) legalFees = 1800;
+        if (p > 1000000) legalFees = 2500;
+
+        const fmt = (num) => '£' + num.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+        
+        const sdltEl = document.getElementById('sdlt-estimate');
+        const legalEl = document.getElementById('legal-fees-estimate');
+        if (sdltEl) sdltEl.value = sdlt.toLocaleString();
+        if (legalEl) legalEl.value = legalFees.toLocaleString();
+
         const splitType = document.querySelector('input[name="depositSplitType"]:checked')?.value;
         appData.depositSplitProportional = splitType === 'yes';
 
@@ -787,4 +815,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBar = document.getElementById('app-progress');
     if (progressBar) progressBar.style.width = '0%';
     loadFromCache();
+
+    // Keyboard Navigation
+    document.addEventListener('keydown', (e) => {
+        // Find visible screen by checking which section does NOT have the hidden attribute
+        const visibleScreen = document.querySelector('main section:not([hidden])');
+        if (!visibleScreen) return;
+
+        // Ignore if user is typing in an input field (unless it's Enter to submit)
+        if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+            return;
+        }
+
+        if (e.key === 'ArrowRight' || e.key === 'Enter') {
+            // Find primary action (Next/Calculate/Get Started)
+            // We look for .btn-primary or .btn-success in the visible screen
+            const nextBtn = visibleScreen.querySelector('button.btn-primary, button.btn-success');
+            if (nextBtn) {
+                // If it's Enter, default behavior might trigger a click anyway if focused, but explicit handling is safer for the wizard flow.
+                // We prevent default to stop form submission if we had a form, though we don't.
+                e.preventDefault();
+                nextBtn.click();
+            }
+        } else if (e.key === 'ArrowLeft') {
+            // Find secondary action (Back)
+            const backBtn = visibleScreen.querySelector('button.btn-secondary');
+            if (backBtn) {
+                e.preventDefault();
+                backBtn.click();
+            }
+        }
+    });
 });
