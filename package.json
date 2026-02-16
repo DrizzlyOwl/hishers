@@ -1,0 +1,16 @@
+{
+  "name": "hishers",
+  "version": "1.0.0",
+  "description": "Fair Bill Splitting Calculator",
+  "main": "app.js",
+  "scripts": {
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^13.6.0"
+  }
+}

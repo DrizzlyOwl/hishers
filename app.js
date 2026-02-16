@@ -31,9 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
         monthlyMortgagePayment: 0,
         postcode: '',
         isNorth: false,
+        regionCode: 'EN', // EN, SC, WA, NI
         band: '',
         beds: 0,
         baths: 0,
+        homeType: 'first',
+        isFTB: false, // First Time Buyer
         // Individual split preferences
         splitTypes: {
             councilTax: 'yes',
@@ -47,104 +50,246 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // DOM Elements Cache
+    const elements = {
+        salaryHis: document.getElementById('salaryHis'),
+        salaryHer: document.getElementById('salaryHer'),
+        postcode: document.getElementById('postcode'),
+        propertyPrice: document.getElementById('propertyPrice'),
+        bedrooms: document.getElementById('bedrooms'),
+        bathrooms: document.getElementById('bathrooms'),
+        councilTaxCost: document.getElementById('councilTaxCost'),
+        energyCost: document.getElementById('energyCost'),
+        waterBill: document.getElementById('waterBill'),
+        broadbandCost: document.getElementById('broadbandCost'),
+        groceriesCost: document.getElementById('groceriesCost'),
+        childcareCost: document.getElementById('childcareCost'),
+        insuranceCost: document.getElementById('insuranceCost'),
+        otherSharedCosts: document.getElementById('otherSharedCosts'),
+        depositPercentage: document.getElementById('depositPercentage'),
+        mortgageInterestRate: document.getElementById('mortgageInterestRate'),
+        mortgageTerm: document.getElementById('mortgageTerm'),
+        estimatePriceBtn: document.getElementById('estimatePriceBtn'),
+        backButton: document.getElementById('back-button'),
+        nextButton: document.getElementById('next-button'),
+        progressBar: document.getElementById('app-progress'),
+        progressLabel: document.getElementById('progress-text-alt'),
+        propertyPriceDisplay: document.getElementById('propertyPrice-estimate-display'),
+        estimatedPriceValue: document.getElementById('estimatedPriceValue'),
+        postcodeError: document.getElementById('postcode-error'),
+        regionAnnouncement: document.getElementById('region-announcement'),
+        sdltEstimate: document.getElementById('sdlt-estimate'),
+        legalFeesEstimate: document.getElementById('legal-fees-estimate'),
+        totalEquityDisplay: document.getElementById('totalEquityDisplay'),
+        mortgageRequiredDisplay: document.getElementById('mortgageRequiredDisplay'),
+        equityHisDisplay: document.getElementById('equityHisDisplay'),
+        equityHerDisplay: document.getElementById('equityHerDisplay'),
+        bandPriceDisplay: document.getElementById('band-price-display'),
+        barHis: document.getElementById('bar-his'),
+        barHer: document.getElementById('bar-her'),
+        ratioTextDesc: document.getElementById('ratio-text-desc'),
+        resultsTable: document.getElementById('results-table'),
+        displayPropertyPrice: document.getElementById('displayPropertyPrice'),
+        
+        // Errors
+        salaryHisError: document.getElementById('salaryHis-error'),
+        salaryHerError: document.getElementById('salaryHer-error'),
+        taxBandError: document.getElementById('taxBand-error'),
+        propertyPriceError: document.getElementById('propertyPrice-error'),
+        bedroomsError: document.getElementById('bedrooms-error'),
+        bathroomsError: document.getElementById('bathrooms-error'),
+        depositPercentageError: document.getElementById('depositPercentage-error'),
+        mortgageInterestRateError: document.getElementById('mortgageInterestRate-error'),
+        mortgageTermError: document.getElementById('mortgageTerm-error'),
+        councilTaxCostError: document.getElementById('councilTaxCost-error'),
+        energyCostError: document.getElementById('energyCost-error'),
+        waterBillError: document.getElementById('waterBill-error'),
+        broadbandError: document.getElementById('broadband-error'),
+        groceriesError: document.getElementById('groceries-error'),
+        childcareError: document.getElementById('childcare-error'),
+        insuranceError: document.getElementById('insurance-error'),
+        otherError: document.getElementById('other-error'),
+
+        // Results
+        resultHis: document.getElementById('result-his'),
+        resultHer: document.getElementById('result-her'),
+        totalBillDisplay: document.getElementById('total-bill-display'),
+        resultSummary: document.getElementById('result-summary'),
+        calculationWorkings: document.getElementById('calculation-workings'),
+        breakdownSummary: document.getElementById('breakdown-summary'),
+        
+        // Breakdown Table (Prefix: bd-)
+        bdMortgageTotal: document.getElementById('bd-mortgage-total'),
+        bdMortgageHis: document.getElementById('bd-mortgage-his'),
+        bdMortgageHer: document.getElementById('bd-mortgage-her'),
+        bdTaxTotal: document.getElementById('bd-tax-total'),
+        bdTaxHis: document.getElementById('bd-tax-his'),
+        bdTaxHer: document.getElementById('bd-tax-her'),
+        bdEnergyTotal: document.getElementById('bd-energy-total'),
+        bdEnergyHis: document.getElementById('bd-energy-his'),
+        bdEnergyHer: document.getElementById('bd-energy-her'),
+        bdWaterTotal: document.getElementById('bd-water-total'),
+        bdWaterHis: document.getElementById('bd-water-his'),
+        bdWaterHer: document.getElementById('bd-water-her'),
+        bdBroadbandTotal: document.getElementById('bd-broadband-total'),
+        bdBroadbandHis: document.getElementById('bd-broadband-his'),
+        bdBroadbandHer: document.getElementById('bd-broadband-her'),
+        bdGroceriesTotal: document.getElementById('bd-groceries-total'),
+        bdGroceriesHis: document.getElementById('bd-groceries-his'),
+        bdGroceriesHer: document.getElementById('bd-groceries-her'),
+        bdCommittedTotal: document.getElementById('bd-committed-total'),
+        bdCommittedHis: document.getElementById('bd-committed-his'),
+        bdCommittedHer: document.getElementById('bd-committed-her'),
+        bdTotalTotal: document.getElementById('bd-total-total'),
+        bdTotalHis: document.getElementById('bd-total-his'),
+        bdTotalHer: document.getElementById('bd-total-her')
+    };
+
+    const FORM_FIELDS = [
+        { id: 'salaryHis', type: 'number' },
+        { id: 'salaryHer', type: 'number' },
+        { id: 'postcode', type: 'text' },
+        { id: 'propertyPrice', type: 'number' },
+        { id: 'bedrooms', type: 'number', key: 'beds' },
+        { id: 'bathrooms', type: 'number', key: 'baths' },
+        { id: 'councilTaxCost', type: 'number' },
+        { id: 'energyCost', type: 'number' },
+        { id: 'waterBill', type: 'number' },
+        { id: 'broadbandCost', type: 'number' },
+        { id: 'groceriesCost', type: 'number' },
+        { id: 'childcareCost', type: 'number' },
+        { id: 'insuranceCost', type: 'number' },
+        { id: 'otherSharedCosts', type: 'number' },
+        { id: 'depositPercentage', type: 'number' },
+        { id: 'mortgageInterestRate', type: 'number' },
+        { id: 'mortgageTerm', type: 'number' }
+    ];
+
     const bandPrices = { 'A': 110, 'B': 128, 'C': 146, 'D': 165, 'E': 201, 'F': 238, 'G': 275, 'H': 330 };
     const CACHE_KEY = 'his_and_hers_cache';
+    const SCREENS = {
+        LANDING: 'screen-1',
+        INCOME: 'screen-2',
+        PROPERTY: 'screen-3',
+        MORTGAGE: 'screen-4',
+        UTILITIES: 'screen-5',
+        COMMITTED: 'screen-6',
+        RESULTS: 'screen-7'
+    };
 
     // --- Core Functions ---
 
+    const formatCurrency = (num, decimals = 0) => {
+        return '£' + num.toLocaleString(undefined, {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        });
+    };
+
     function saveToCache() {
-        const splitPrefs = {};
-        Object.keys(appData.splitTypes).forEach(key => {
-            const radio = document.querySelector(`input[name="${key}SplitType"]:checked`);
-            if (radio) {
-                splitPrefs[`${key}SplitType`] = radio.value;
+        const inputs = {};
+        
+        // Standard Fields
+        FORM_FIELDS.forEach(field => {
+            if (elements[field.id]) {
+                inputs[field.id] = elements[field.id].value;
             }
         });
 
-        const inputs = {
-            salaryHis: document.getElementById('salaryHis').value,
-            salaryHer: document.getElementById('salaryHer').value,
-            postcode: document.getElementById('postcode').value,
-            propertyPrice: document.getElementById('propertyPrice').value,
-            taxBand: document.querySelector('input[name="taxBand"]:checked')?.value,
-            homeType: document.querySelector('input[name="homeType"]:checked')?.value,
-            bedrooms: document.getElementById('bedrooms').value,
-            bathrooms: document.getElementById('bathrooms').value,
-            councilTaxCost: document.getElementById('councilTaxCost').value,
-            energyCost: document.getElementById('energyCost').value,
-            waterBill: document.getElementById('waterBill').value,
-            broadbandCost: document.getElementById('broadbandCost').value,
-            groceriesCost: document.getElementById('groceriesCost').value,
-            childcareCost: document.getElementById('childcareCost').value,
-            insuranceCost: document.getElementById('insuranceCost').value,
-            otherSharedCosts: document.getElementById('otherSharedCosts').value,
-            depositPercentage: document.getElementById('depositPercentage').value,
-            depositSplitType: document.querySelector('input[name="depositSplitType"]:checked')?.value,
-            mortgageInterestRate: document.getElementById('mortgageInterestRate').value,
-            mortgageTerm: document.getElementById('mortgageTerm').value,
-            ...splitPrefs
-        };
+        // Radio Groups
+        Object.keys(appData.splitTypes).forEach(key => {
+            const radio = document.querySelector(`input[name="${key}SplitType"]:checked`);
+            if (radio) inputs[`${key}SplitType`] = radio.value;
+        });
+
+        // Other Radios
+        const taxBand = document.querySelector('input[name="taxBand"]:checked');
+        if (taxBand) inputs.taxBand = taxBand.value;
+
+        const homeType = document.querySelector('input[name="homeType"]:checked');
+        if (homeType) inputs.homeType = homeType.value;
+
+        const buyerStatus = document.querySelector('input[name="buyerStatus"]:checked');
+        if (buyerStatus) inputs.buyerStatus = buyerStatus.value;
+
+        const depositSplit = document.querySelector('input[name="depositSplitType"]:checked');
+        if (depositSplit) inputs.depositSplitType = depositSplit.value;
+
         localStorage.setItem(CACHE_KEY, JSON.stringify(inputs));
     }
 
     function loadFromCache() {
         const cached = localStorage.getItem(CACHE_KEY);
-        if (!cached) return;
+        if (!cached) {
+            // Initial visibility check if no cache
+            const ftbContainer = document.getElementById('ftb-container');
+            if (ftbContainer) {
+                 if (appData.homeType === 'first') ftbContainer.removeAttribute('hidden');
+                 else ftbContainer.setAttribute('hidden', '');
+            }
+            return;
+        }
 
         const inputs = JSON.parse(cached);
+        
+        // Restore Standard Fields
         for (const [id, value] of Object.entries(inputs)) {
-            const el = document.getElementById(id);
-            if (!el) {
-                // Handle radio buttons by name
+            if (elements[id]) {
+                elements[id].value = value;
+            } else {
+                // Restore Radios
                 if (id.endsWith('SplitType')) {
-                    const name = id;
-                    const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+                    const radio = document.querySelector(`input[name="${id}"][value="${value}"]`);
                     if (radio) radio.checked = true;
                     
-                    const dataKey = name.replace('SplitType', '');
+                    const dataKey = id.replace('SplitType', '');
                     if (appData.splitTypes.hasOwnProperty(dataKey)) {
                         appData.splitTypes[dataKey] = value;
                     }
-                }
-                if (id === 'taxBand' && value) {
-                    const radio = document.querySelector(`input[name="taxBand"][value="${value}"]`);
-                    if (radio) {
-                        radio.checked = true;
-                        updatePricePreview(value);
-                    }
-                }
-                if (id === 'homeType' && value) {
-                    const radio = document.querySelector(`input[name="homeType"][value="${value}"]`);
+                } else if (id === 'taxBand' || id === 'homeType' || id === 'depositSplitType' || id === 'buyerStatus') {
+                    const radio = document.querySelector(`input[name="${id}"][value="${value}"]`);
                     if (radio) radio.checked = true;
+                    if (id === 'taxBand') updatePricePreview(value);
                 }
-                if (id === 'depositSplitType' && value) {
-                    const radio = document.querySelector(`input[name="depositSplitType"][value="${value}"]`);
-                    if (radio) radio.checked = true;
-                }
-                continue;
             }
-            el.value = value;
         }
         
-        appData.salaryHis = parseFloat(inputs.salaryHis) || 0;
-        appData.salaryHer = parseFloat(inputs.salaryHer) || 0;
+        // Sync App Data from restored fields
+        FORM_FIELDS.forEach(field => {
+            const val = elements[field.id].value;
+            const key = field.key || field.id;
+            
+            if (appData.hasOwnProperty(key)) {
+                if (field.type === 'number') {
+                    appData[key] = parseFloat(val) || 0;
+                } else {
+                    appData[key] = val;
+                }
+            }
+        });
+
+        // Derived Data
         const total = appData.salaryHis + appData.salaryHer;
         if (total > 0) {
             appData.ratioHis = appData.salaryHis / total;
             appData.ratioHer = appData.salaryHer / total;
         }
-        appData.postcode = inputs.postcode || '';
-        appData.propertyPrice = parseFloat(inputs.propertyPrice) || 0;
         appData.band = inputs.taxBand || '';
-        appData.beds = parseInt(inputs.bedrooms) || 0;
-        appData.baths = parseInt(inputs.bathrooms) || 0;
         appData.depositSplitProportional = inputs.depositSplitType === 'yes';
+        if (inputs.homeType) appData.homeType = inputs.homeType;
+        if (inputs.buyerStatus) appData.isFTB = inputs.buyerStatus === 'ftb';
         
         if (appData.propertyPrice > 0) {
             updatePropertyPriceDisplay(appData.propertyPrice, false);
         }
         
         checkRegion(); 
+        
+        const ftbContainer = document.getElementById('ftb-container');
+        if (ftbContainer) {
+             if (appData.homeType === 'first') ftbContainer.removeAttribute('hidden');
+             else ftbContainer.setAttribute('hidden', '');
+        }
     }
 
     window.setAllSplitTypes = function(screen, type) {
@@ -172,12 +317,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updatePropertyPriceDisplay(price, isEstimated) {
-        const display = document.getElementById('propertyPrice-estimate-display');
+        const display = elements.propertyPriceDisplay;
         if (!display) return;
 
         if (price > 0) {
             const labelText = isEstimated ? 'Using estimated market price: ' : 'Using manual market price: ';
-            display.innerHTML = `${labelText}<span id="estimatedPriceValue">£${price.toLocaleString()}</span>`;
+            display.innerHTML = `${labelText}<span id="estimatedPriceValue">${formatCurrency(price)}</span>`;
             display.removeAttribute('hidden');
         } else {
             display.setAttribute('hidden', '');
@@ -189,29 +334,65 @@ document.addEventListener('DOMContentLoaded', () => {
         return postcodeRegEx.test(postcode);
     }
 
+    const REGIONS = {
+        NI: { name: 'Northern Ireland', prefixes: ['BT'], cost: 0, code: 'NI' },
+        SCOTLAND: { name: 'Scotland', prefixes: ['AB', 'DD', 'DG', 'EH', 'FK', 'G', 'HS', 'IV', 'KA', 'KW', 'KY', 'ML', 'PA', 'PH', 'TD', 'ZE'], cost: 42, code: 'SC' },
+        WALES: { name: 'Wales', prefixes: ['CF', 'LD', 'LL', 'NP', 'SA', 'SY'], cost: 55, code: 'WA' },
+        SOUTH_WEST: { name: 'South West', prefixes: ['BA', 'BH', 'BS', 'DT', 'EX', 'PL', 'SN', 'SP', 'TA', 'TQ', 'TR'], cost: 62, code: 'EN' },
+        SOUTH: { name: 'South', prefixes: ['BN', 'CT', 'GU', 'ME', 'OX', 'PO', 'RG', 'RH', 'SL', 'TN'], cost: 58, code: 'EN' },
+        LONDON: { name: 'London', prefixes: ['E', 'EC', 'N', 'NW', 'SE', 'SW', 'W', 'WC', 'BR', 'CR', 'DA', 'EN', 'HA', 'IG', 'KT', 'RM', 'SM', 'TW', 'UB', 'WD'], cost: 54, code: 'EN' },
+        EAST: { name: 'East of England', prefixes: ['AL', 'CB', 'CM', 'CO', 'EN', 'HP', 'IP', 'LU', 'NR', 'RM', 'SG', 'SS'], cost: 52, code: 'EN' },
+        MIDLANDS: { name: 'Midlands', prefixes: ['B', 'CV', 'DE', 'DY', 'HR', 'LE', 'LN', 'NG', 'NN', 'ST', 'SY', 'TF', 'WR', 'WS', 'WV'], cost: 48, code: 'EN' },
+        NORTH: { name: 'North of England', prefixes: ['BB', 'BD', 'BL', 'CA', 'CH', 'CW', 'DH', 'DL', 'DN', 'FY', 'HD', 'HG', 'HU', 'HX', 'L', 'LA', 'LS', 'M', 'NE', 'OL', 'PR', 'S', 'SK', 'SR', 'TS', 'WA', 'WF', 'WN', 'YO'], cost: 45, code: 'EN' }
+    };
+
+    function getRegionFromPostcode(postcode) {
+        const pc = postcode.trim().toUpperCase();
+        if (!pc) return null;
+        const prefix2 = pc.substring(0, 2);
+        const prefix1 = pc.substring(0, 1);
+
+        for (const regionKey in REGIONS) {
+            if (REGIONS[regionKey].prefixes.some(p => prefix2.startsWith(p) || (p.length === 1 && prefix1 === p))) {
+                return regionKey;
+            }
+        }
+        return null;
+    }
+
     function checkRegion() {
-        const postcodeInput = document.getElementById('postcode');
+        const postcodeInput = elements.postcode;
         formatPostcode(postcodeInput);
         const pc = postcodeInput.value.trim().toUpperCase();
 
         if (pc.length > 0 && !isValidPostcode(pc)) {
-            document.getElementById('postcode-error').removeAttribute('hidden');
+            elements.postcodeError.removeAttribute('hidden');
             return;
         } else {
-            document.getElementById('postcode-error').setAttribute('hidden', '');
+            elements.postcodeError.setAttribute('hidden', '');
         }
 
         appData.postcode = pc;
-        const northernPrefixes = ['G', 'E', 'N', 'L', 'M', 'B', 'S'];
-        const prefix = pc.charAt(0);
+        const regionKey = getRegionFromPostcode(pc);
+        const northernRegions = ['NORTH', 'MIDLANDS', 'WALES', 'SCOTLAND'];
 
-        const announceDiv = document.getElementById('region-announcement');
-        if (northernPrefixes.includes(prefix)) {
-            appData.isNorth = true;
-            announceDiv.innerText = "Northern region detected. Heating estimates adjusted.";
+        const announceDiv = elements.regionAnnouncement;
+        if (regionKey) {
+            const regionName = REGIONS[regionKey].name;
+            appData.regionCode = REGIONS[regionKey].code;
+            if (northernRegions.includes(regionKey)) {
+                appData.isNorth = true;
+                announceDiv.innerText = `${regionName} region detected. Heating estimates adjusted.`;
+            } else {
+                appData.isNorth = false;
+                announceDiv.innerText = `${regionName} region detected.`;
+            }
         } else if (pc.length > 0) {
             appData.isNorth = false;
-            announceDiv.innerText = "Region recorded.";
+            appData.regionCode = 'EN'; // Default
+            announceDiv.innerText = "Region could not be determined.";
+        } else {
+            announceDiv.innerText = "";
         }
     }
 
@@ -228,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const endpointUrl = 'https://landregistry.data.gov.uk/landregistry/query';
         const url = `${endpointUrl}?query=${encodeURIComponent(sparqlQuery)}`;
 
-        hideWarning(2);
+        hideWarning(3);
 
         try {
             const response = await fetch(url, {
@@ -244,9 +425,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const average = total / bindings.length;
             return Math.round(average / 1000) * 1000;
         } catch (error) {
-            showWarning(2, "We couldn't fetch live market data, so we've provided a local estimate.");
+            showWarning(3, "We couldn't fetch live market data, so we've provided a local estimate.");
             const postcodePrefix = postcode.charAt(0);
-            const beds = parseInt(document.getElementById('bedrooms').value) || 2;
+            const beds = parseInt(elements.bedrooms.value) || 2;
             let basePrice = 250000; 
             if (['L', 'M', 'B', 'S', 'N', 'G'].includes(postcodePrefix)) basePrice = 180000; 
             else if (['W', 'E'].includes(postcodePrefix) || postcode.startsWith('SW') || postcode.startsWith('SE')) basePrice = 450000; 
@@ -255,71 +436,99 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function calculateStampDuty(price, region, homeType, isFTB) {
+        if (price <= 0) return 0;
+        let tax = 0;
+        const isAdditional = homeType === 'second';
+
+        if (region === 'SC') { // Scotland (LBTT)
+            if (isAdditional) {
+                // ADS 8% on total price if >= £40k
+                if (price >= 40000) tax += price * 0.08;
+                
+                // Standard LBTT Rates
+                if (price > 750000) tax += (145000 * 0) + (105000 * 0.02) + (75000 * 0.05) + (425000 * 0.10) + ((price - 750000) * 0.12);
+                else if (price > 325000) tax += (145000 * 0) + (105000 * 0.02) + (75000 * 0.05) + ((price - 325000) * 0.10);
+                else if (price > 250000) tax += (145000 * 0) + (105000 * 0.02) + ((price - 250000) * 0.05);
+                else if (price > 145000) tax += (price - 145000) * 0.02;
+            } else {
+                // Standard Rates first
+                if (price > 750000) tax += (145000 * 0) + (105000 * 0.02) + (75000 * 0.05) + (425000 * 0.10) + ((price - 750000) * 0.12);
+                else if (price > 325000) tax += (145000 * 0) + (105000 * 0.02) + (75000 * 0.05) + ((price - 325000) * 0.10);
+                else if (price > 250000) tax += (145000 * 0) + (105000 * 0.02) + ((price - 250000) * 0.05);
+                else if (price > 145000) tax += (price - 145000) * 0.02;
+
+                // FTB Relief: 0% up to £175k (Save up to £600)
+                if (isFTB) {
+                    const relief = 600;
+                    if (tax < relief) tax = 0;
+                    else tax -= relief;
+                }
+            }
+        } else if (region === 'WA') { // Wales (LTT)
+            const surcharge = isAdditional ? 0.05 : 0;
+            // Bands: 0-225, 225-400, 400-750, 750-1.5m, 1.5m+
+            if (price > 1500000) tax += (225000 * (0 + surcharge)) + (175000 * (0.06 + surcharge)) + (350000 * (0.075 + surcharge)) + (750000 * (0.10 + surcharge)) + ((price - 1500000) * (0.12 + surcharge));
+            else if (price > 750000) tax += (225000 * (0 + surcharge)) + (175000 * (0.06 + surcharge)) + (350000 * (0.075 + surcharge)) + ((price - 750000) * (0.10 + surcharge));
+            else if (price > 400000) tax += (225000 * (0 + surcharge)) + (175000 * (0.06 + surcharge)) + ((price - 400000) * (0.075 + surcharge));
+            else if (price > 225000) tax += (225000 * (0 + surcharge)) + ((price - 225000) * (0.06 + surcharge));
+            else tax += price * surcharge;
+
+            if (isAdditional && price < 40000) tax = 0;
+        } else { // England & NI (SDLT)
+            const surcharge = isAdditional ? 0.05 : 0;
+            
+            if (isFTB && !isAdditional) {
+                if (price <= 500000) {
+                    if (price > 300000) tax = (price - 300000) * 0.05;
+                    else tax = 0;
+                    return tax;
+                }
+            }
+            
+            if (price > 1500000) tax += (125000 * (0 + surcharge)) + (125000 * (0.02 + surcharge)) + (675000 * (0.05 + surcharge)) + (575000 * (0.10 + surcharge)) + ((price - 1500000) * (0.12 + surcharge));
+            else if (price > 925000) tax += (125000 * (0 + surcharge)) + (125000 * (0.02 + surcharge)) + (675000 * (0.05 + surcharge)) + ((price - 925000) * (0.10 + surcharge));
+            else if (price > 250000) tax += (125000 * (0 + surcharge)) + (125000 * (0.02 + surcharge)) + ((price - 250000) * (0.05 + surcharge));
+            else if (price > 125000) tax += (125000 * (0 + surcharge)) + ((price - 125000) * (0.02 + surcharge));
+            else tax += price * surcharge;
+
+            if (isAdditional && price < 40000) tax = 0;
+        }
+        return Math.floor(tax);
+    }
+
     function calculateEquityDetails() {
         const propertyPrice = appData.propertyPrice;
-        const depositPercentageInput = document.getElementById('depositPercentage');
-        if (!depositPercentageInput) return;
-
-        let depositPercentage = parseFloat(depositPercentageInput.value);
+        let depositPercentage = appData.depositPercentage;
         
+        // Validation of appData state (clamping)
         if (depositPercentage > 100) {
             depositPercentage = 100;
-            depositPercentageInput.value = 100;
+            appData.depositPercentage = 100;
+            elements.depositPercentage.value = 100;
         } else if (depositPercentage < 0) {
             depositPercentage = 0;
-            depositPercentageInput.value = 0;
+            appData.depositPercentage = 0;
+            elements.depositPercentage.value = 0;
         }
 
         if (isNaN(propertyPrice) || propertyPrice <= 0) return;
 
-        appData.depositPercentage = isNaN(depositPercentage) ? 0 : depositPercentage;
-        appData.totalEquity = propertyPrice * (appData.depositPercentage / 100);
+        appData.totalEquity = propertyPrice * (depositPercentage / 100);
         appData.mortgageRequired = propertyPrice - appData.totalEquity;
         
-        // SDLT Calculation (Standard Residential UK Rates as of 2026)
-        // Rates: 0% up to £125k, 2% up to £250k, 5% up to £925k, 10% up to £1.5m, 12% above.
-        // 2nd Home surcharge: +5% on all bands.
-        let sdlt = 0;
-        const p = propertyPrice;
-        const isSecondHome = document.querySelector('input[name="homeType"]:checked')?.value === 'second';
-        const surcharge = isSecondHome ? 0.05 : 0;
-
-        if (p > 1500000) {
-            sdlt = (125000 * (0.00 + surcharge)) + 
-                   (125000 * (0.02 + surcharge)) + 
-                   (675000 * (0.05 + surcharge)) + 
-                   (575000 * (0.10 + surcharge)) + 
-                   ((p - 1500000) * (0.12 + surcharge));
-        } else if (p > 925000) {
-            sdlt = (125000 * (0.00 + surcharge)) + 
-                   (125000 * (0.02 + surcharge)) + 
-                   (675000 * (0.05 + surcharge)) + 
-                   ((p - 925000) * (0.10 + surcharge));
-        } else if (p > 250000) {
-            sdlt = (125000 * (0.00 + surcharge)) + 
-                   (125000 * (0.02 + surcharge)) + 
-                   ((p - 250000) * (0.05 + surcharge));
-        } else if (p > 125000) {
-            sdlt = (125000 * (0.00 + surcharge)) + 
-                   ((p - 125000) * (0.02 + surcharge));
-        } else {
-            sdlt = p * surcharge;
-        }
+        // SDLT Calculation (Region & FTB aware)
+        const sdlt = calculateStampDuty(propertyPrice, appData.regionCode, appData.homeType, appData.isFTB);
 
         // Legal Fees Estimate
         let legalFees = 1200; // Base fee
-        if (p > 500000) legalFees = 1800;
-        if (p > 1000000) legalFees = 2500;
+        if (propertyPrice > 500000) legalFees = 1800;
+        if (propertyPrice > 1000000) legalFees = 2500;
 
-        const fmt = (num) => '£' + num.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
-        
-        const sdltEl = document.getElementById('sdlt-estimate');
-        const legalEl = document.getElementById('legal-fees-estimate');
+        const sdltEl = elements.sdltEstimate;
+        const legalEl = elements.legalFeesEstimate;
         if (sdltEl) sdltEl.value = sdlt.toLocaleString();
         if (legalEl) legalEl.value = legalFees.toLocaleString();
-
-        const splitType = document.querySelector('input[name="depositSplitType"]:checked')?.value;
-        appData.depositSplitProportional = splitType === 'yes';
 
         if (appData.depositSplitProportional) {
             appData.equityHis = appData.totalEquity * appData.ratioHis;
@@ -329,16 +538,16 @@ document.addEventListener('DOMContentLoaded', () => {
             appData.equityHer = appData.totalEquity * 0.5;
         }
 
-        document.getElementById('totalEquityDisplay').innerText = `£${appData.totalEquity.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
-        document.getElementById('mortgageRequiredDisplay').innerText = `£${appData.mortgageRequired.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
-        document.getElementById('equityHisDisplay').innerText = `£${appData.equityHis.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
-        document.getElementById('equityHerDisplay').innerText = `£${appData.equityHer.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
+        elements.totalEquityDisplay.innerText = formatCurrency(appData.totalEquity);
+        elements.mortgageRequiredDisplay.innerText = formatCurrency(appData.mortgageRequired);
+        elements.equityHisDisplay.innerText = formatCurrency(appData.equityHis);
+        elements.equityHerDisplay.innerText = formatCurrency(appData.equityHer);
     }
 
     function calculateMonthlyMortgage() {
         const principal = appData.mortgageRequired;
-        const annualRate = parseFloat(document.getElementById('mortgageInterestRate').value);
-        const termYears = parseFloat(document.getElementById('mortgageTerm').value);
+        const annualRate = appData.mortgageInterestRate;
+        const termYears = appData.mortgageTerm;
 
         if (isNaN(principal) || principal <= 0 || isNaN(annualRate) || annualRate <= 0 || isNaN(termYears) || termYears <= 0) {
             appData.monthlyMortgagePayment = 0;
@@ -353,57 +562,40 @@ document.addEventListener('DOMContentLoaded', () => {
     function updatePricePreview(band) {
         appData.band = band;
         const cost = bandPrices[band];
-        const display = document.getElementById('band-price-display');
+        const display = elements.bandPriceDisplay;
         const icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>`;
-        display.innerHTML = `${icon} <span>Band ${band} selected. Estimated cost: £${cost} per month.</span>`;
+        display.innerHTML = `${icon} <span>Band ${band} selected. Estimated cost: ${formatCurrency(cost)} per month.</span>`;
     }
 
     function updateRatioBar() {
         const hP = Math.round(appData.ratioHis * 100);
         const sP = Math.round(appData.ratioHer * 100);
-        document.getElementById('bar-his').style.width = hP + '%';
-        document.getElementById('bar-his').innerText = hP + '%';
-        document.getElementById('bar-her').style.width = sP + '%';
-        document.getElementById('bar-her').innerText = sP + '%';
-        document.getElementById('ratio-text-desc').innerText = `Income ratio is ${hP}% Person A and ${sP}% Person B.`;
+        elements.barHis.style.width = hP + '%';
+        elements.barHis.innerText = hP + '%';
+        elements.barHer.style.width = sP + '%';
+        elements.barHer.innerText = sP + '%';
+        elements.ratioTextDesc.innerText = `Income ratio is ${hP}% Person A and ${sP}% Person B.`;
     }
 
     function estimateWaterCost(postcode, bathrooms) {
-        const pc = postcode.trim().toUpperCase();
-        if (!pc) return 30;
-        const prefix2 = pc.substring(0, 2);
-        const prefix1 = pc.substring(0, 1);
-        const regions = {
-            NI: { prefixes: ['BT'], cost: 0 },
-            SCOTLAND: { prefixes: ['AB', 'DD', 'DG', 'EH', 'FK', 'G', 'HS', 'IV', 'KA', 'KW', 'KY', 'ML', 'PA', 'PH', 'TD', 'ZE'], cost: 42 },
-            WALES: { prefixes: ['CF', 'LD', 'LL', 'NP', 'SA', 'SY'], cost: 55 },
-            SOUTH_WEST: { prefixes: ['BA', 'BH', 'BS', 'DT', 'EX', 'PL', 'SN', 'SP', 'TA', 'TQ', 'TR'], cost: 62 },
-            SOUTH: { prefixes: ['BN', 'CT', 'GU', 'ME', 'OX', 'PO', 'RG', 'RH', 'SL', 'TN'], cost: 58 },
-            LONDON: { prefixes: ['E', 'EC', 'N', 'NW', 'SE', 'SW', 'W', 'WC', 'BR', 'CR', 'DA', 'EN', 'HA', 'IG', 'KT', 'RM', 'SM', 'TW', 'UB', 'WD'], cost: 54 },
-            EAST: { prefixes: ['AL', 'CB', 'CM', 'CO', 'EN', 'HP', 'IP', 'LU', 'NR', 'RM', 'SG', 'SS'], cost: 52 },
-            MIDLANDS: { prefixes: ['B', 'CV', 'DE', 'DY', 'HR', 'LE', 'LN', 'NG', 'NN', 'ST', 'SY', 'TF', 'WR', 'WS', 'WV'], cost: 48 },
-            NORTH: { prefixes: ['BB', 'BD', 'BL', 'CA', 'CH', 'CW', 'DH', 'DL', 'DN', 'FY', 'HD', 'HG', 'HU', 'HX', 'L', 'LA', 'LS', 'M', 'NE', 'OL', 'PR', 'S', 'SK', 'SR', 'TS', 'WA', 'WF', 'WN', 'YO'], cost: 45 }
-        };
-        let baseCost = 50;
-        for (const region in regions) {
-            if (regions[region].prefixes.some(p => prefix2.startsWith(p) || (p.length === 1 && prefix1 === p))) {
-                baseCost = regions[region].cost;
-                break;
-            }
+        const regionKey = getRegionFromPostcode(postcode);
+        let baseCost = 50; // Default cost
+        if (regionKey && REGIONS[regionKey]) {
+            baseCost = REGIONS[regionKey].cost;
         }
         return baseCost + (Math.max(0, bathrooms - 1) * 5);
     }
 
     function populateEstimates() {
-        document.getElementById('councilTaxCost').value = bandPrices[appData.band];
+        elements.councilTaxCost.value = bandPrices[appData.band];
         let energy = 40 + (appData.beds * 25) + (appData.baths * 15);
         if (appData.isNorth) energy *= 1.1;
         if (['E','F','G','H'].includes(appData.band)) energy *= 1.15;
-        document.getElementById('energyCost').value = Math.round(energy);
-        document.getElementById('waterBill').value = Math.round(estimateWaterCost(appData.postcode, appData.baths));
-        appData.waterBill = parseFloat(document.getElementById('waterBill').value) || 0;
-        appData.mortgageInterestRate = parseFloat(document.getElementById('mortgageInterestRate').value) || 0;
-        appData.mortgageTerm = parseFloat(document.getElementById('mortgageTerm').value) || 0;
+        elements.energyCost.value = Math.round(energy);
+        elements.waterBill.value = Math.round(estimateWaterCost(appData.postcode, appData.baths));
+        appData.waterBill = parseFloat(elements.waterBill.value) || 0;
+        appData.mortgageInterestRate = parseFloat(elements.mortgageInterestRate.value) || 0;
+        appData.mortgageTerm = parseFloat(elements.mortgageTerm.value) || 0;
         calculateMonthlyMortgage();
     }
 
@@ -423,7 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Window Exposed Functions ---
 
     window.downloadCSV = function() {
-        const table = document.getElementById('results-table');
+        const table = elements.resultsTable;
         let csv = [];
         const rows = table.querySelectorAll('tr');
         
@@ -447,6 +639,39 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
     };
 
+    function updatePagination(screenId) {
+        const backButton = elements.backButton;
+        const nextButton = elements.nextButton;
+        
+        const screenConfig = {
+            [SCREENS.LANDING]: { back: null, next: () => switchScreen(SCREENS.INCOME), nextText: 'Get Started' },
+            [SCREENS.INCOME]: { back: () => switchScreen(SCREENS.LANDING), next: validateAndNext1 },
+            [SCREENS.PROPERTY]: { back: () => switchScreen(SCREENS.INCOME), next: validateAndNext2 },
+            [SCREENS.MORTGAGE]: { back: () => switchScreen(SCREENS.PROPERTY), next: validateAndNextMortgage },
+            [SCREENS.UTILITIES]: { back: () => switchScreen(SCREENS.MORTGAGE), next: validateAndNext3 },
+            [SCREENS.COMMITTED]: { back: () => switchScreen(SCREENS.UTILITIES), next: validateAndNextCommitted, nextText: 'Calculate' },
+            [SCREENS.RESULTS]: { back: () => switchScreen(SCREENS.COMMITTED), next: clearCacheAndReload, nextText: 'Start Over' }
+        };
+
+        const config = screenConfig[screenId];
+        if (!config) return;
+
+        if (config.back) {
+            backButton.onclick = config.back;
+            backButton.style.display = 'block';
+        } else {
+            backButton.style.display = 'none';
+        }
+
+        if (config.next) {
+            nextButton.onclick = config.next;
+            nextButton.innerText = config.nextText || 'Next';
+            nextButton.style.display = 'block';
+        } else {
+            nextButton.style.display = 'none';
+        }
+    }
+
     window.switchScreen = function(id) {
         saveToCache();
         document.querySelectorAll('main section').forEach(el => el.setAttribute('hidden', ''));
@@ -462,17 +687,17 @@ document.addEventListener('DOMContentLoaded', () => {
         target.focus();
 
         const progressMap = {
-            'screen-landing': { p: 0, text: 'Step 1 of 7: Welcome' },
-            'screen-1': { p: 15, text: 'Step 2 of 7: Income' },
-            'screen-2': { p: 30, text: 'Step 3 of 7: Property' },
-            'screen-4': { p: 45, text: 'Step 4 of 7: Mortgage & Equity' },
-            'screen-3': { p: 60, text: 'Step 5 of 7: Utilities' },
-            'screen-committed': { p: 80, text: 'Step 6 of 7: Committed Spending' },
-            'screen-5': { p: 100, text: 'Step 7 of 7: Results' }
+            [SCREENS.LANDING]: { p: 0, text: 'Step 1 of 7: Welcome' },
+            [SCREENS.INCOME]: { p: 15, text: 'Step 2 of 7: Income' },
+            [SCREENS.PROPERTY]: { p: 30, text: 'Step 3 of 7: Property' },
+            [SCREENS.MORTGAGE]: { p: 45, text: 'Step 4 of 7: Mortgage & Equity' },
+            [SCREENS.UTILITIES]: { p: 60, text: 'Step 5 of 7: Utilities' },
+            [SCREENS.COMMITTED]: { p: 80, text: 'Step 6 of 7: Committed Spending' },
+            [SCREENS.RESULTS]: { p: 100, text: 'Step 7 of 7: Results' }
         };
         const stepData = progressMap[id] || { p: 0, text: '' };
-        const progressBar = document.getElementById('app-progress');
-        const progressLabel = document.getElementById('progress-text-alt');
+        const progressBar = elements.progressBar;
+        const progressLabel = elements.progressLabel;
         
         if (progressBar) {
             progressBar.style.width = `${stepData.p}%`;
@@ -483,194 +708,198 @@ document.addEventListener('DOMContentLoaded', () => {
             progressLabel.innerText = stepData.text;
         }
 
-        if (id === 'screen-2') hideWarning(2);
-        if (id === 'screen-3' || id === 'screen-5') updateRatioBar();
-        if (id === 'screen-4') {
-            const propPrice = parseFloat(document.getElementById('propertyPrice').value) || 0;
+        if (id === SCREENS.PROPERTY) hideWarning(3);
+        if (id === SCREENS.UTILITIES || id === SCREENS.RESULTS) updateRatioBar();
+        if (id === SCREENS.MORTGAGE) {
+            const propPrice = parseFloat(elements.propertyPrice.value) || 0;
             appData.propertyPrice = propPrice;
-            const displayField = document.getElementById('displayPropertyPrice');
+            const displayField = elements.displayPropertyPrice;
             if (displayField) {
                 displayField.value = propPrice.toLocaleString();
             }
             calculateEquityDetails();
         }
+        updatePagination(id);
     };
 
     window.clearCacheAndReload = function() {
         localStorage.removeItem(CACHE_KEY);
-        document.querySelectorAll('input').forEach(input => {
-            if (input.type === 'radio' || input.type === 'checkbox') input.checked = false;
-            else input.value = '';
-        });
-        const regionAnnounce = document.getElementById('region-announcement');
-        if (regionAnnounce) regionAnnounce.innerText = '';
-        const priceEstimate = document.getElementById('propertyPrice-estimate-display');
-        if (priceEstimate) priceEstimate.setAttribute('hidden', '');
         location.reload();
     };
 
-    window.validateAndNext1 = function() {
-        const hInput = document.getElementById('salaryHis');
-        const sInput = document.getElementById('salaryHer');
-        const hError = document.getElementById('salaryHis-error');
-        const sError = document.getElementById('salaryHer-error');
-        
-        const h = parseFloat(hInput.value);
-        const s = parseFloat(sInput.value);
+    /**
+     * Generic Validation Helper
+     * @param {Array} fields - Array of objects defining field validation rules
+     * @param {String} nextScreen - ID of the next screen to navigate to
+     * @param {Object} options - Optional callbacks: preValidation (async), globalCheck, onSuccess
+     */
+    const validateAndNext = async function(fields, nextScreen, options = {}) {
         let isValid = true;
 
-        if (isNaN(h) || h <= 0) { hError.removeAttribute('hidden'); isValid = false; }
-        else { hError.setAttribute('hidden', ''); }
+        // Custom pre-validation (e.g. async checks)
+        if (options.preValidation) {
+            const preValid = await options.preValidation();
+            if (!preValid) isValid = false;
+        }
 
-        if (isNaN(s) || s <= 0) { sError.removeAttribute('hidden'); isValid = false; }
-        else { sError.setAttribute('hidden', ''); }
+        // Standard Field Validation
+        fields.forEach(field => {
+            const el = elements[field.id];
+            const errorEl = elements[field.errorId];
+            if (errorEl) errorEl.setAttribute('hidden', ''); // Reset error
+
+            let val = el.value;
+            let fieldValid = true;
+
+            if (field.type === 'number') {
+                val = parseFloat(val);
+                if (field.allowEmpty && el.value === '') {
+                    val = 0;
+                } else if (isNaN(val) || (field.min !== undefined && val < field.min) || (field.max !== undefined && val > field.max)) {
+                    fieldValid = false;
+                }
+            } else if (field.required && !val.trim()) {
+                fieldValid = false;
+            }
+
+            if (!fieldValid) {
+                if (errorEl) errorEl.removeAttribute('hidden');
+                isValid = false;
+            } else if (field.saveTo) {
+                appData[field.saveTo] = val;
+            }
+        });
+
+        // Global check (e.g. radio button selection)
+        if (options.globalCheck) {
+            if (!options.globalCheck()) isValid = false;
+        }
 
         if (!isValid) return;
-        appData.salaryHis = h; appData.salaryHer = s;
-        const total = h + s;
-        appData.ratioHis = h / total; appData.ratioHer = s / total;
-        switchScreen('screen-2');
+
+        if (options.onSuccess) options.onSuccess();
+        switchScreen(nextScreen);
     };
+
+    const validateAndNext1 = () => validateAndNext([
+        { id: 'salaryHis', errorId: 'salaryHisError', type: 'number', min: 0.01, saveTo: 'salaryHis' },
+        { id: 'salaryHer', errorId: 'salaryHerError', type: 'number', min: 0.01, saveTo: 'salaryHer' }
+    ], 'screen-3', {
+        onSuccess: () => {
+            const total = appData.salaryHis + appData.salaryHer;
+            appData.ratioHis = appData.salaryHis / total;
+            appData.ratioHer = appData.salaryHer / total;
+        }
+    });
 
     window.checkRegion = checkRegion;
     window.updatePricePreview = updatePricePreview;
 
-    window.validateAndNext2 = async function() {
-        const propPriceInput = document.getElementById('propertyPrice');
-        const postcodeField = document.getElementById('postcode');
-        const taxBandError = document.getElementById('taxBand-error');
-        const bedsInput = document.getElementById('bedrooms');
-        const bathsInput = document.getElementById('bathrooms');
-        const priceError = document.getElementById('propertyPrice-error');
-        const postcodeError = document.getElementById('postcode-error');
-        const bedsError = document.getElementById('bedrooms-error');
-        const bathsError = document.getElementById('bathrooms-error');
-        
-        let isValid = true;
-        taxBandError.setAttribute('hidden', '');
-        priceError.setAttribute('hidden', '');
-        postcodeError.setAttribute('hidden', '');
-        bedsError.setAttribute('hidden', '');
-        bathsError.setAttribute('hidden', '');
+    const validateAndNext2 = () => validateAndNext([
+        { id: 'bedrooms', errorId: 'bedroomsError', type: 'number', min: 1, saveTo: 'beds' },
+        { id: 'bathrooms', errorId: 'bathroomsError', type: 'number', min: 1, saveTo: 'baths' }
+    ], 'screen-4', {
+        preValidation: async () => {
+            const propPriceInput = elements.propertyPrice;
+            const postcodeField = elements.postcode;
+            const priceError = elements.propertyPriceError;
+            const postcodeError = elements.postcodeError;
+            
+            // Reset errors handled here
+            priceError.setAttribute('hidden', '');
+            postcodeError.setAttribute('hidden', '');
 
-        let propertyPrice = parseFloat(propPriceInput.value);
-        if (isNaN(propertyPrice) || propertyPrice <= 0) {
-            const postcode = postcodeField.value.trim().toUpperCase();
-            if (!postcode || !isValidPostcode(postcode)) {
-                if (!postcode) postcodeError.removeAttribute('hidden');
-                priceError.removeAttribute('hidden');
-                isValid = false;
+            let propertyPrice = parseFloat(propPriceInput.value);
+            if (isNaN(propertyPrice) || propertyPrice <= 0) {
+                const postcode = postcodeField.value.trim().toUpperCase();
+                if (!postcode || !isValidPostcode(postcode)) {
+                    if (!postcode) postcodeError.removeAttribute('hidden');
+                    priceError.removeAttribute('hidden');
+                    return false;
+                } else {
+                    // Try to fetch estimate
+                    propertyPrice = await getEstimatedPropertyPrice(postcode);
+                    propPriceInput.value = propertyPrice;
+                    updatePropertyPriceDisplay(propertyPrice, true);
+                }
             } else {
-                propertyPrice = await getEstimatedPropertyPrice(postcode);
-                propPriceInput.value = propertyPrice;
-                updatePropertyPriceDisplay(propertyPrice, true);
+                updatePropertyPriceDisplay(propertyPrice, false);
             }
-        } else updatePropertyPriceDisplay(propertyPrice, false);
+            appData.propertyPrice = propertyPrice;
+            return true;
+        },
+        globalCheck: () => {
+            if (!appData.band) {
+                elements.taxBandError.removeAttribute('hidden');
+                return false;
+            }
+            return true;
+        },
+        onSuccess: () => {
+            updateRatioBar();
+            populateEstimates();
+        }
+    });
 
-        if (!appData.band) { taxBandError.removeAttribute('hidden'); isValid = false; }
-        
-        const beds = parseInt(bedsInput.value);
-        if (isNaN(beds) || beds < 1) { bedsError.removeAttribute('hidden'); isValid = false; }
-        const baths = parseInt(bathsInput.value);
-        if (isNaN(baths) || baths < 1) { bathsError.removeAttribute('hidden'); isValid = false; }
+    const validateAndNextMortgage = () => validateAndNext([
+        { id: 'depositPercentage', errorId: 'depositPercentageError', type: 'number', min: 0, max: 100 }, // No saveTo, handled by calc? No, saveTo should be used.
+        // wait, original validteAndNextMortgage set appData.mortgageInterestRate/Term.
+        // It did NOT set depositPercentage? 
+        // Original: const deposit = ...; if invalid return; appData.mortgageInterestRate = rate; ...
+        // It calculated calculateMonthlyMortgage() at the end.
+        // depositPercentage is used in calculateEquityDetails called by event listener.
+        // But appData.depositPercentage needs to be accurate?
+        // Actually, calculateEquityDetails updates appData.depositPercentage. 
+        // So validation just needs to ensure it's valid.
+        { id: 'mortgageInterestRate', errorId: 'mortgageInterestRateError', type: 'number', min: 0, saveTo: 'mortgageInterestRate' },
+        { id: 'mortgageTerm', errorId: 'mortgageTermError', type: 'number', min: 1, max: 50, saveTo: 'mortgageTerm' }
+    ], 'screen-5', {
+        onSuccess: () => {
+            calculateMonthlyMortgage();
+        }
+    });
 
-        if (!isValid) return;
-        appData.propertyPrice = propertyPrice;
-        appData.beds = beds;
-        appData.baths = baths;
-        updateRatioBar();
-        populateEstimates();
-        switchScreen('screen-4');
-    };
+    const validateAndNext3 = () => validateAndNext([
+        { id: 'councilTaxCost', errorId: 'councilTaxCostError', type: 'number', min: 0 }, // councilTax is NOT saved to appData in original?
+        // Original validateAndNext3 checked inputs but only set appData.broadbandCost?
+        // Wait, appData only stores broadbandCost, groceriesCost etc?
+        // calculateFinalSplit reads VALUES from inputs directly.
+        // So saving to appData here is actually Optional if calculateFinalSplit still reads DOM.
+        // But better to be consistent.
+        // The original logic ONLY updated appData.broadbandCost explicitly.
+        // The others were just left in the inputs.
+        // I will replicate original behavior or improve it?
+        // Task 5 is "Refactor Final Split Calculation". I will likely make it read from appData.
+        // So I should save to appData here.
+        // appData has placeholders for these? Yes in init: waterBill: 0, broadbandCost: 0...
+        // But not councilTaxCost or energyCost in appData init object?
+        // "councilTaxCost: document.getElementById...value" in saveToCache.
+        // appData init has: "waterBill: 0, broadbandCost: 0".
+        // It DOES NOT have councilTaxCost or energyCost in appData.
+        // I should probably add them to appData if I want to be clean, but for now I'll just validate.
+        { id: 'energyCost', errorId: 'energyCostError', type: 'number', min: 0 },
+        { id: 'waterBill', errorId: 'waterBillError', type: 'number', min: 0, saveTo: 'waterBill' }, // appData has waterBill
+        { id: 'broadbandCost', errorId: 'broadbandError', type: 'number', min: 0, saveTo: 'broadbandCost' }
+    ], 'screen-6');
 
-    window.validateAndNextMortgage = function() {
-        const depositInput = document.getElementById('depositPercentage');
-        const rateInput = document.getElementById('mortgageInterestRate');
-        const termInput = document.getElementById('mortgageTerm');
-
-        const depError = document.getElementById('depositPercentage-error');
-        const rateError = document.getElementById('mortgageInterestRate-error');
-        const termError = document.getElementById('mortgageTerm-error');
-
-        let isValid = true;
-        [depError, rateError, termError].forEach(e => e.setAttribute('hidden', ''));
-
-        const deposit = parseFloat(depositInput.value);
-        if (isNaN(deposit) || deposit < 0 || deposit > 100) { depError.removeAttribute('hidden'); isValid = false; }
-        const rate = parseFloat(rateInput.value);
-        if (isNaN(rate) || rate < 0) { rateError.removeAttribute('hidden'); isValid = false; }
-        const term = parseInt(termInput.value);
-        if (isNaN(term) || term < 1 || term > 50) { termError.removeAttribute('hidden'); isValid = false; }
-        
-        if (!isValid) return;
-
-        appData.mortgageInterestRate = rate;
-        appData.mortgageTerm = term;
-        calculateMonthlyMortgage();
-        switchScreen('screen-3');
-    };
-
-    window.validateAndNext3 = function() {
-        const taxInput = document.getElementById('councilTaxCost');
-        const energyInput = document.getElementById('energyCost');
-        const waterInput = document.getElementById('waterBill');
-        const broadbandInput = document.getElementById('broadbandCost');
-        
-        const taxError = document.getElementById('councilTaxCost-error');
-        const enError = document.getElementById('energyCost-error');
-        const wtError = document.getElementById('waterBill-error');
-        const bbError = document.getElementById('broadband-error');
-
-        let isValid = true;
-        [taxError, enError, wtError, bbError].forEach(e => e.setAttribute('hidden', ''));
-
-        if (isNaN(parseFloat(taxInput.value)) || parseFloat(taxInput.value) < 0) { taxError.removeAttribute('hidden'); isValid = false; }
-        if (isNaN(parseFloat(energyInput.value)) || parseFloat(energyInput.value) < 0) { enError.removeAttribute('hidden'); isValid = false; }
-        if (isNaN(parseFloat(waterInput.value)) || parseFloat(waterInput.value) < 0) { wtError.removeAttribute('hidden'); isValid = false; }
-        if (isNaN(parseFloat(broadbandInput.value)) || parseFloat(broadbandInput.value) < 0) { bbError.removeAttribute('hidden'); isValid = false; }
-
-        if (!isValid) return;
-        appData.broadbandCost = parseFloat(broadbandInput.value) || 0;
-        switchScreen('screen-committed');
-    };
-
-    window.validateAndNextCommitted = function() {
-        const groceries = document.getElementById('groceriesCost');
-        const childcare = document.getElementById('childcareCost');
-        const insurance = document.getElementById('insuranceCost');
-        const other = document.getElementById('otherSharedCosts');
-
-        const grError = document.getElementById('groceries-error');
-        const ccError = document.getElementById('childcare-error');
-        const isError = document.getElementById('insurance-error');
-        const osError = document.getElementById('other-error');
-
-        let isValid = true;
-        [grError, ccError, isError, osError].forEach(e => e.setAttribute('hidden', ''));
-
-        if (groceries.value !== '' && (isNaN(parseFloat(groceries.value)) || parseFloat(groceries.value) < 0)) { grError.removeAttribute('hidden'); isValid = false; }
-        if (childcare.value !== '' && (isNaN(parseFloat(childcare.value)) || parseFloat(childcare.value) < 0)) { ccError.removeAttribute('hidden'); isValid = false; }
-        if (insurance.value !== '' && (isNaN(parseFloat(insurance.value)) || parseFloat(insurance.value) < 0)) { isError.removeAttribute('hidden'); isValid = false; }
-        if (other.value !== '' && (isNaN(parseFloat(other.value)) || parseFloat(other.value) < 0)) { osError.removeAttribute('hidden'); isValid = false; }
-
-        if (!isValid) return;
-        appData.groceriesCost = parseFloat(groceries.value) || 0;
-        appData.childcareCost = parseFloat(childcare.value) || 0;
-        appData.insuranceCost = parseFloat(insurance.value) || 0;
-        appData.otherSharedCosts = parseFloat(other.value) || 0;
-        
-        calculateFinalSplit();
-    }
+    const validateAndNextCommitted = () => validateAndNext([
+        { id: 'groceriesCost', errorId: 'groceriesError', type: 'number', min: 0, allowEmpty: true, saveTo: 'groceriesCost' },
+        { id: 'childcareCost', errorId: 'childcareError', type: 'number', min: 0, allowEmpty: true, saveTo: 'childcareCost' },
+        { id: 'insuranceCost', errorId: 'insuranceError', type: 'number', min: 0, allowEmpty: true, saveTo: 'insuranceCost' },
+        { id: 'otherSharedCosts', errorId: 'otherError', type: 'number', min: 0, allowEmpty: true, saveTo: 'otherSharedCosts' }
+    ], 'screen-7', {
+        onSuccess: calculateFinalSplit
+    });
 
     window.calculateFinalSplit = function() {
-        const taxVal = parseFloat(document.getElementById('councilTaxCost').value) || 0;
-        const enVal = parseFloat(document.getElementById('energyCost').value) || 0;
-        const wtVal = parseFloat(document.getElementById('waterBill').value) || 0;
-        const bbVal = parseFloat(document.getElementById('broadbandCost').value) || 0;
-        const grVal = parseFloat(document.getElementById('groceriesCost').value) || 0;
-        const ccVal = parseFloat(document.getElementById('childcareCost').value) || 0;
-        const isVal = parseFloat(document.getElementById('insuranceCost').value) || 0;
-        const osVal = parseFloat(document.getElementById('otherSharedCosts').value) || 0;
+        const taxVal = parseFloat(elements.councilTaxCost.value) || 0;
+        const enVal = parseFloat(elements.energyCost.value) || 0;
+        const wtVal = parseFloat(elements.waterBill.value) || 0;
+        const bbVal = parseFloat(elements.broadbandCost.value) || 0;
+        const grVal = parseFloat(elements.groceriesCost.value) || 0;
+        const ccVal = parseFloat(elements.childcareCost.value) || 0;
+        const isVal = parseFloat(elements.insuranceCost.value) || 0;
+        const osVal = parseFloat(elements.otherSharedCosts.value) || 0;
         const mortgage = appData.monthlyMortgagePayment;
 
         const getSplit = (key, val) => {
@@ -698,47 +927,45 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalS = tax.s + energy.s + water.s + broadband.s + groceries.s + committedS + mort.s;
         const total = totalH + totalS;
 
-        const fmt = (num) => '£' + num.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        
-        document.getElementById('result-his').innerText = fmt(totalH);
-        document.getElementById('result-her').innerText = fmt(totalS);
-        document.getElementById('total-bill-display').innerText = fmt(total);
+        elements.resultHis.innerText = formatCurrency(totalH, 2);
+        elements.resultHer.innerText = formatCurrency(totalS, 2);
+        elements.totalBillDisplay.innerText = formatCurrency(total, 2);
 
-        document.getElementById('bd-mortgage-total').innerText = fmt(mortgage);
-        document.getElementById('bd-mortgage-his').innerText = fmt(mort.h);
-        document.getElementById('bd-mortgage-her').innerText = fmt(mort.s);
-        document.getElementById('bd-tax-total').innerText = fmt(taxVal);
-        document.getElementById('bd-tax-his').innerText = fmt(tax.h);
-        document.getElementById('bd-tax-her').innerText = fmt(tax.s);
-        document.getElementById('bd-energy-total').innerText = fmt(enVal);
-        document.getElementById('bd-energy-his').innerText = fmt(energy.h);
-        document.getElementById('bd-energy-her').innerText = fmt(energy.s);
-        document.getElementById('bd-water-total').innerText = fmt(wtVal);
-        document.getElementById('bd-water-his').innerText = fmt(water.h);
-        document.getElementById('bd-water-her').innerText = fmt(water.s);
-        document.getElementById('bd-broadband-total').innerText = fmt(bbVal);
-        document.getElementById('bd-broadband-his').innerText = fmt(broadband.h);
-        document.getElementById('bd-broadband-her').innerText = fmt(broadband.s);
-        document.getElementById('bd-groceries-total').innerText = fmt(grVal);
-        document.getElementById('bd-groceries-his').innerText = fmt(groceries.h);
-        document.getElementById('bd-groceries-her').innerText = fmt(groceries.s);
-        document.getElementById('bd-committed-total').innerText = fmt(committedTotal);
-        document.getElementById('bd-committed-his').innerText = fmt(committedH);
-        document.getElementById('bd-committed-her').innerText = fmt(committedS);
-        document.getElementById('bd-total-total').innerText = fmt(total);
-        document.getElementById('bd-total-his').innerText = fmt(totalH);
-        document.getElementById('bd-total-her').innerText = fmt(totalS);
+        elements.bdMortgageTotal.innerText = formatCurrency(mortgage, 2);
+        elements.bdMortgageHis.innerText = formatCurrency(mort.h, 2);
+        elements.bdMortgageHer.innerText = formatCurrency(mort.s, 2);
+        elements.bdTaxTotal.innerText = formatCurrency(taxVal, 2);
+        elements.bdTaxHis.innerText = formatCurrency(tax.h, 2);
+        elements.bdTaxHer.innerText = formatCurrency(tax.s, 2);
+        elements.bdEnergyTotal.innerText = formatCurrency(enVal, 2);
+        elements.bdEnergyHis.innerText = formatCurrency(energy.h, 2);
+        elements.bdEnergyHer.innerText = formatCurrency(energy.s, 2);
+        elements.bdWaterTotal.innerText = formatCurrency(wtVal, 2);
+        elements.bdWaterHis.innerText = formatCurrency(water.h, 2);
+        elements.bdWaterHer.innerText = formatCurrency(water.s, 2);
+        elements.bdBroadbandTotal.innerText = formatCurrency(bbVal, 2);
+        elements.bdBroadbandHis.innerText = formatCurrency(broadband.h, 2);
+        elements.bdBroadbandHer.innerText = formatCurrency(broadband.s, 2);
+        elements.bdGroceriesTotal.innerText = formatCurrency(grVal, 2);
+        elements.bdGroceriesHis.innerText = formatCurrency(groceries.h, 2);
+        elements.bdGroceriesHer.innerText = formatCurrency(groceries.s, 2);
+        elements.bdCommittedTotal.innerText = formatCurrency(committedTotal, 2);
+        elements.bdCommittedHis.innerText = formatCurrency(committedH, 2);
+        elements.bdCommittedHer.innerText = formatCurrency(committedS, 2);
+        elements.bdTotalTotal.innerText = formatCurrency(total, 2);
+        elements.bdTotalHis.innerText = formatCurrency(totalH, 2);
+        elements.bdTotalHer.innerText = formatCurrency(totalS, 2);
 
-        const summaryEl = document.getElementById('result-summary');
+        const summaryEl = elements.resultSummary;
         if (summaryEl) {
             const diff = Math.abs(totalH - totalS);
             const moreP = totalH > totalS ? 'Person A' : 'Person B';
             const lessP = totalH > totalS ? 'Person B' : 'Person A';
             if (diff < 0.01) summaryEl.innerText = "Both partners contribute equally based on your selected split rules.";
-            else summaryEl.innerText = `${moreP} pays ${fmt(diff)} more than ${lessP} per month overall.`;
+            else summaryEl.innerText = `${moreP} pays ${formatCurrency(diff, 2)} more than ${lessP} per month overall.`;
         }
 
-        const workingsEl = document.getElementById('calculation-workings');
+        const workingsEl = elements.calculationWorkings;
         if (workingsEl) {
             const totalSalary = appData.salaryHis + appData.salaryHer;
             const hPerc = (appData.ratioHis * 100).toFixed(1);
@@ -757,92 +984,98 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }
 
-        const breakdownSummaryEl = document.getElementById('breakdown-summary');
+        const breakdownSummaryEl = elements.breakdownSummary;
         if (breakdownSummaryEl) {
             const mainCosts = mort.h + mort.s + taxVal + enVal + wtVal;
             const lifestyleCosts = bbVal + grVal + committedTotal;
             breakdownSummaryEl.innerText = `Out of the £${total.toLocaleString(undefined, {minimumFractionDigits: 2})} total monthly spend, £${mainCosts.toLocaleString(undefined, {minimumFractionDigits: 2})} is dedicated to the property and utilities, while £${lifestyleCosts.toLocaleString(undefined, {minimumFractionDigits: 2})} covers shared lifestyle and committed costs. This report captures all your shared commitments in one place.`;
         }
 
-        switchScreen('screen-5');
+        switchScreen('screen-7');
     };
 
     // --- Event Listeners ---
 
-    const postcodeInputElement = document.getElementById('postcode');
-    if (postcodeInputElement) {
-        postcodeInputElement.addEventListener('input', () => {
-            formatPostcode(postcodeInputElement);
+    // Consolidated Input Listeners
+    FORM_FIELDS.forEach(field => {
+        const el = elements[field.id];
+        if (!el) return;
+
+        el.addEventListener('input', () => {
+            // Pre-processing
+            if (field.id === 'postcode') formatPostcode(el);
+
+            // Sync Data
+            let val = el.value;
+            if (field.type === 'number') val = parseFloat(val) || 0;
+            appData[field.key || field.id] = val;
+
+            // Specific Logic
+            if (field.id === 'propertyPrice') updatePropertyPriceDisplay(val, false);
+            if (field.id === 'depositPercentage') calculateEquityDetails();
+            if (field.id === 'mortgageInterestRate' || field.id === 'mortgageTerm') calculateMonthlyMortgage();
+
             saveToCache();
         });
-    }
+    });
 
-    const pPriceInput = document.getElementById('propertyPrice');
-    if (pPriceInput) {
-        pPriceInput.addEventListener('input', () => {
-            const val = parseFloat(pPriceInput.value) || 0;
-            updatePropertyPriceDisplay(val, false);
-            saveToCache();
-        });
-    }
-
-    const estimatePriceBtn = document.getElementById('estimatePriceBtn');
+    const estimatePriceBtn = elements.estimatePriceBtn;
     if (estimatePriceBtn) {
         estimatePriceBtn.addEventListener('click', async function() {
-            const postcodeField = document.getElementById('postcode');
+            const postcodeField = elements.postcode;
             const postcode = postcodeField.value.trim().toUpperCase();
             if (!postcode || !isValidPostcode(postcode)) { return; }
             const estimatedPrice = await getEstimatedPropertyPrice(postcode);
-            document.getElementById('propertyPrice').value = estimatedPrice;
+            elements.propertyPrice.value = estimatedPrice;
+            appData.propertyPrice = estimatedPrice; // Ensure appData is updated
             updatePropertyPriceDisplay(estimatedPrice, true);
-            saveToCache();
-        });
-    }
-
-    const depositPctInput = document.getElementById('depositPercentage');
-    if (depositPctInput) {
-        depositPctInput.addEventListener('input', () => {
-            calculateEquityDetails();
             saveToCache();
         });
     }
 
     document.querySelectorAll('input[name="depositSplitType"]').forEach(radio => {
         radio.addEventListener('change', () => {
+            appData.depositSplitProportional = radio.value === 'yes';
             calculateEquityDetails();
             saveToCache();
         });
     });
+
+    const ftbContainer = document.getElementById('ftb-container');
+
+    function updateFTBVisibility() {
+        if (!ftbContainer) return;
+        if (appData.homeType === 'first') {
+            ftbContainer.removeAttribute('hidden');
+        } else {
+            ftbContainer.setAttribute('hidden', '');
+        }
+    }
 
     document.querySelectorAll('input[name="homeType"]').forEach(radio => {
         radio.addEventListener('change', () => {
+            appData.homeType = radio.value;
+            updateFTBVisibility();
             calculateEquityDetails();
             saveToCache();
         });
     });
 
-    const mortgageRateInput = document.getElementById('mortgageInterestRate');
-    if (mortgageRateInput) {
-        mortgageRateInput.addEventListener('input', () => {
-            calculateMonthlyMortgage();
+    document.querySelectorAll('input[name="buyerStatus"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            appData.isFTB = radio.value === 'ftb';
+            calculateEquityDetails();
             saveToCache();
         });
-    }
-
-    const mortgageTermInput = document.getElementById('mortgageTerm');
-    if (mortgageTermInput) {
-        mortgageTermInput.addEventListener('input', () => {
-            calculateMonthlyMortgage();
-            saveToCache();
-        });
-    }
+    });
 
     // Initial load: Set hidden states for all sections except landing
     document.querySelectorAll('main section').forEach(el => el.setAttribute('hidden', ''));
-    document.getElementById('screen-landing').removeAttribute('hidden');
-    const progressBar = document.getElementById('app-progress');
+    document.getElementById('screen-1').removeAttribute('hidden');
+    const progressBar = elements.progressBar;
     if (progressBar) progressBar.style.width = '0%';
     loadFromCache();
+    updatePagination('screen-1');
 
     // Keyboard Navigation
     document.addEventListener('keydown', (e) => {
@@ -856,22 +1089,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (e.key === 'ArrowRight' || e.key === 'Enter') {
-            // Find primary action (Next/Calculate/Get Started)
-            // We look for .btn-primary or .btn-success in the visible screen
-            const nextBtn = visibleScreen.querySelector('button.btn-primary, button.btn-success');
-            if (nextBtn) {
-                // If it's Enter, default behavior might trigger a click anyway if focused, but explicit handling is safer for the wizard flow.
-                // We prevent default to stop form submission if we had a form, though we don't.
-                e.preventDefault();
-                nextBtn.click();
-            }
+            elements.nextButton.click();
         } else if (e.key === 'ArrowLeft') {
-            // Find secondary action (Back)
-            const backBtn = visibleScreen.querySelector('button.btn-secondary');
-            if (backBtn) {
-                e.preventDefault();
-                backBtn.click();
-            }
+            elements.backButton.click();
         }
     });
 });

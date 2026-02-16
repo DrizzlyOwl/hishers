@@ -7,10 +7,12 @@ His&Hers is a modern, high-performance web utility designed to help couples dete
 - **Proportionate Bill Splitting**: Automatically calculates a "Fair Share" ratio based on annual pre-tax salaries, ensuring both partners retain a similar proportion of their disposable income.
 - **Smart Estimation Logic**:
   - **Property Valuation**: Integrates with the UK Land Registry SPARQL endpoint to fetch real-world price data by postcode.
+  - **Regional Stamp Duty**: Automatically applies the correct tax rates for England/NI (SDLT), Scotland (LBTT), and Wales (LTT) based on the property postcode.
   - **Regional Utilities**: Adjusts energy and water estimates based on postcode prefixes (e.g., Northern vs. Southern adjustments) and property size.
   - **Tax Bands**: Provides monthly estimates based on standard UK Council Tax bands (A-H).
 - **Comprehensive Financial Planning**:
   - **Mortgage & Equity**: Calculates monthly repayments and breaks down initial deposit requirements.
+  - **Buyer Status Support**: Accurately handles "Sole Property" vs "Additional Property" scenarios, including First Time Buyer (FTB) relief calculations where applicable.
   - **Flexible Rules**: Users can choose to split specific line items (like Council Tax or Groceries) either by the income ratio or exactly 50/50.
   - **Committed Spending**: Includes optional categories for childcare, insurance, and shared lifestyle costs.
 - **Advanced Results & Export**:

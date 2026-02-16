@@ -629,6 +629,9 @@ input:read-only {
     border-color: #FDE68A; 
 }
 
+/* Utilities */
+.fw-bold { font-weight: 700; }
+
 /* Buttons */
 button {
     cursor: pointer;
@@ -951,4 +954,26 @@ footer a svg {
 }
 @media (min-width: 768px) {
     footer { margin-top: 4rem; font-size: var(--font-size-base); }
+}
+
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+.skip-link:focus {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: auto;
+    height: auto;
+    padding: 1rem;
+    background-color: var(--color-bg-app);
+    color: var(--color-primary);
+    z-index: 10000;
+    border: 2px solid var(--color-primary);
 }
