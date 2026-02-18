@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=1771261000">
+    <link rel="stylesheet" href="style.css?v=1771261001">
 </head>
 <body>
 
@@ -28,7 +28,7 @@
         <header class="header-brand" id="header-brand">
             <img src="logo.svg" alt="FairShare - Salary Proportion Calculator">
             <button id="start-over-button" onclick="clearCacheAndReload()" aria-label="Start over and clear all data">
-                Start Over  
+                Start Over
             </button>
         </header>
 
@@ -40,24 +40,24 @@
 
             <div class="landing-intro" id="landing-intro">
                 <p>
-                    <strong>Fairness is the foundation of a happy home.</strong><br>
-                    Splitting household bills exactly 50/50 can be a burden when one partner earns significantly more than the other.
+                    <strong>Build a fair financial foundation for your home.</strong><br>
+                    Establish proportionate bill splitting based on your relative incomes in just 7 steps.
                 </p>
-                <p>
-                    <strong>FairShare</strong> helps you move in together with confidence by calculating
-                    <strong>proportionate contributions</strong> based on your relative incomes.
-                </p>
+                <div class="alert-info">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                    <p style="margin-bottom: 0;"><strong>Efficiency Tip:</strong> Use your <strong>Arrow Keys</strong> or <strong>Enter</strong> to navigate quickly between screens.</p>
+                </div>
                 <p class="screen-summary">
-                    By following this 7-step guide, you'll establish a sustainable financial plan that respects both partners' earning power. Completing every section allows us to generate a comprehensive "Fair Share" report, leaving no hidden costs to cause friction later.
+                    This guide automates your household budgeting. By establishing a contribution ratio, you'll ensure both partners retain a fair share of disposable income, removing financial friction before it starts.
                 </p>
             </div>
 
             <div class="how-it-works" id="how-it-works">
-                <h3>How it works:</h3>
+                <h3>Rapid Overview:</h3>
                 <ol>
-                    <li>Establish your contribution ratio based on your pre-tax salaries.</li>
-                    <li>Estimate your new home's market value and running costs using local data.</li>
-                    <li>See a complete breakdown of exactly what each person should pay.</li>
+                    <li>Set your income-based contribution ratio.</li>
+                    <li>Estimate property value and regional running costs.</li>
+                    <li>Review your detailed proportionate split report.</li>
                 </ol>
             </div>
         </section>
@@ -68,9 +68,9 @@
                 Your Income
             </h2>
 
-            <p>Enter the annual pre-tax salary for both partners to determine your fair share ratio.</p>
+            <p>Establish your base contribution ratio.</p>
             <p class="screen-summary">
-                Your salaries are the most critical data points. We use your combined income to establish a percentage-based ratio (e.g., 60/40). This ratio ensures that both partners retain a similar proportion of their "disposable" income after the shared bills are paid, preventing financial resentment.
+                Provide your annual pre-tax salaries to calculate your unique contribution percentage. This ensures all shared bills are split proportionately to each partner's individual earning power.
             </p>
 
             <div class="form-group">
@@ -106,9 +106,9 @@
                 Property Details
             </h2>
 
-            <p>Tell us about the property you're moving into so we can estimate local costs.</p>
+            <p>Define your home to automate cost estimates.</p>
             <p class="screen-summary">
-                Postcode and property size allow us to pull real-world data from the UK Land Registry and regional utility providers. Accuracy here is vital; a 3-bed house in Manchester has very different running costs than a 1-bed flat in London. Filling this in avoids "bill shock" once you move.
+                Enter your postcode and property size. We use regional data to automate accurate estimates for Council Tax and local utility rates based on your specific location.
             </p>
 
             <div class="form-group">
@@ -197,44 +197,12 @@
                 Mortgage & Equity
             </h2>
 
-            <p>Finalize your home ownership and financing details.</p>
+            <p>Finalize home ownership and financing details.</p>
             <p class="screen-summary">
-                Establishing the mortgage payment and initial deposit share is often the biggest financial commitment a couple makes. We split the monthly mortgage payment by your income ratio automatically to keep it fair, but you can choose how to handle the initial cash deposit. Populating this ensures your equity and debt are managed transparently from day one.
+                Set your deposit and interest rates. We calculate monthly repayments and individual equity shares to ensure your largest joint commitment is split fairly and transparently.
             </p>
 
-            <div class="form-group">
-                <label class="form-label" for="displayPropertyPrice">Current Market Value</label>
-                <div class="input-group">
-                    <span class="input-addon">£</span>
-                    <input type="text" id="displayPropertyPrice" class="input-control" readonly tabindex="-1" aria-describedby="displayPropertyPrice-help">
-                </div>
-                <div id="displayPropertyPrice-help" class="help-text">As specified in the property details section.</div>
-            </div>
-
-            <fieldset class="form-group">
-                <legend class="form-label">Purchase Type</legend>
-                <div class="switch-toggle">
-                    <input type="radio" name="homeType" id="homeFirst" value="first" checked>
-                    <label for="homeFirst">Sole Property</label>
-                    <input type="radio" name="homeType" id="homeSecond" value="second">
-                    <label for="homeSecond">Additional Property</label>
-                    <span class="switch-slider" aria-hidden="true"></span>
-                </div>
-                <div id="home-type-help" class="help-text">Determines the Stamp Duty (SDLT) rate applied to this purchase.</div>
-            </fieldset>
-
-            <fieldset class="form-group" id="ftb-container">
-                <legend class="form-label">Buyer Status</legend>
-                <div class="switch-toggle">
-                    <input type="radio" name="buyerStatus" id="buyerStandard" value="standard" checked>
-                    <label for="buyerStandard">Standard</label>
-                    <input type="radio" name="buyerStatus" id="buyerFTB" value="ftb">
-                    <label for="buyerFTB">First Time Buyer</label>
-                    <span class="switch-slider" aria-hidden="true"></span>
-                </div>
-                <div id="buyer-status-help" class="help-text">Eligible for First Time Buyer relief in applicable regions.</div>
-            </fieldset>
-
+            <!-- 1. Context: Loan & Deposit -->
             <div class="form-group">
                 <label class="form-label" for="depositPercentage">Total Deposit Percentage (%)</label>
                 <div class="input-group">
@@ -260,34 +228,6 @@
                 <div id="deposit-split-help" class="help-text">Choose whether the initial cash deposit should match your salary ratio or be equal.</div>
             </fieldset>
 
-            <div class="alert-info" id="equity-mortgage-summary" aria-live="polite">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
-                <div>
-                    Total Equity Required: <span id="totalEquityDisplay" class="fw-bold">£0</span><br>
-                    Mortgage Required: <span id="mortgageRequiredDisplay" class="fw-bold">£0</span>
-                </div>
-            </div>
-
-            <div class="purchase-costs-box" style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(44, 62, 99, 0.03); border-radius: 0.75rem; border: 1px dashed var(--color-border);">
-                <h4 style="margin-top: 0;">Estimated Purchase Costs</h4>
-                <div class="form-group">
-                    <label class="form-label">Estimated Stamp Duty (SDLT)</label>
-                    <div class="input-group">
-                        <span class="input-addon">£</span>
-                        <input type="text" id="sdlt-estimate" class="input-control" readonly tabindex="-1">
-                    </div>
-                    <p class="help-text">Standard residential rate estimate.</p>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Estimated Legal Fees</label>
-                    <div class="input-group">
-                        <span class="input-addon">£</span>
-                        <input type="text" id="legal-fees-estimate" class="input-control" readonly tabindex="-1">
-                    </div>
-                    <p class="help-text">Includes conveyancing, searches, and bank transfer fees.</p>
-                </div>
-            </div>
-
             <div class="form-row">
                 <div class="form-group col">
                     <label class="form-label" for="mortgageInterestRate">Interest Rate (APR %)</label>
@@ -312,6 +252,71 @@
             </div>
             <div id="mortgageTerm-help" class="help-text" style="margin-top: -1rem; margin-bottom: 1.5rem;">The duration of your mortgage repayment plan.</div>
 
+            <!-- 2. Context: Purchase Costs -->
+            <fieldset class="form-group">
+                <legend class="form-label">Purchase Type</legend>
+                <div class="switch-toggle">
+                    <input type="radio" name="homeType" id="homeFirst" value="first" checked>
+                    <label for="homeFirst">Sole Property</label>
+                    <input type="radio" name="homeType" id="homeSecond" value="second">
+                    <label for="homeSecond">Additional Property</label>
+                    <span class="switch-slider" aria-hidden="true"></span>
+                </div>
+                <div id="home-type-help" class="help-text">Determines the Stamp Duty (SDLT) rate applied to this purchase.</div>
+            </fieldset>
+
+            <fieldset class="form-group" id="ftb-container">
+                <legend class="form-label">Buyer Status</legend>
+                <div class="switch-toggle">
+                    <input type="radio" name="buyerStatus" id="buyerStandard" value="standard" checked>
+                    <label for="buyerStandard">Standard</label>
+                    <input type="radio" name="buyerStatus" id="buyerFTB" value="ftb">
+                    <label for="buyerFTB">First Time Buyer</label>
+                    <span class="switch-slider" aria-hidden="true"></span>
+                </div>
+                <div id="buyer-status-help" class="help-text">Eligible for First Time Buyer relief in applicable regions.</div>
+            </fieldset>
+
+            <div class="purchase-costs-box" aria-live="polite" style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(44, 62, 99, 0.03); border-radius: 0.75rem; border: 1px dashed var(--color-border);">
+                <h4 style="margin-top: 0;">Estimated Purchase Costs</h4>
+                <div class="form-group">
+                    <label class="form-label">Estimated Stamp Duty (SDLT)</label>
+                    <div class="input-group">
+                        <span class="input-addon">£</span>
+                        <input type="text" id="sdlt-estimate" class="input-control" readonly>
+                    </div>
+                    <p class="help-text">Standard residential rate estimate.</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Estimated Legal Fees</label>
+                    <div class="input-group">
+                        <span class="input-addon">£</span>
+                        <input type="text" id="legal-fees-estimate" class="input-control" readonly>
+                    </div>
+                    <p class="help-text">Includes conveyancing, searches, and bank transfer fees.</p>
+                </div>
+            </div>
+
+            <!-- 3. Context: Summary -->
+            <div class="form-group">
+                <label class="form-label" for="displayPropertyPrice">Current Market Value</label>
+                <div class="input-group">
+                    <span class="input-addon">£</span>
+                    <input type="text" id="displayPropertyPrice" class="input-control" readonly aria-describedby="displayPropertyPrice-help">
+                </div>
+                <div id="displayPropertyPrice-help" class="help-text">As specified in the property details section.</div>
+            </div>
+
+            <div class="alert-info" id="equity-mortgage-summary" aria-live="polite">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                <div>
+                    Total Equity Required: <span id="totalEquityDisplay" class="fw-bold">£0</span><br>
+                    Mortgage Required: <span id="mortgageRequiredDisplay" class="fw-bold">£0</span><br>
+                    Est. Monthly Mortgage: <span id="monthlyMortgageDisplay" class="fw-bold">£0</span><br>
+                    Total Repayment (inc. Interest): <span id="totalRepaymentDisplay" class="fw-bold">£0</span>
+                </div>
+            </div>
+
             <div class="summary-cards" id="deposit-share-summary">
                 <div class="summary-card share-p1">
                     <p class="summary-card-label">Your Deposit Share</p>
@@ -330,9 +335,9 @@
                 Monthly Utilities
             </h2>
 
-            <p>Confirm the standard monthly running costs for your home.</p>
+            <p>Review baseline household costs.</p>
             <p class="screen-summary">
-                These are the "non-negotiable" costs of running a household. We have provided estimates based on your previous property selections, but you can override them with exact quotes. Refining these numbers ensures both partners aren't over-committing to a lifestyle they can't actually afford.
+                We've provided regional estimates for your essential utilities. Adjust these figures to match your actual monthly commitments for more precise results.
             </p>
 
             <div class="master-toggle">
@@ -442,9 +447,9 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m.75 3.375H5.625c-.621 0-1.125-.504-1.125-1.125V4.125c0-.621.504-1.125 1.125-1.125h12.75c.621 0 1.125.504 1.125 1.125v12.75c0 .621-.504 1.125-1.125 1.125H15m-3 0v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21" /></svg>
                 Committed Spending
             </h2>
-            <p>Optional shared monthly costs you both contribute to.</p>
+            <p>Add optional shared monthly expenses.</p>
             <p class="screen-summary">
-                Beyond the roof over your head, shared life costs like food and childcare are where most budget disagreements happen. By populating these fields, you turn hidden expenses into visible, agreed-upon line items. You can choose to split these exactly 50/50 or by income ratio depending on your preferences.
+                Defining shared lifestyle costs like food and childcare now ensures full transparency in your joint budget, preventing friction over variable expenses later.
             </p>
 
             <div class="master-toggle">
@@ -552,12 +557,12 @@
         <section class="screen" id="screen-7" aria-labelledby="heading-results" tabindex="-1" hidden>
             <h2 id="heading-results">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" /></svg>
-                Calculation Results
+                Detailed Analysis
             </h2>
 
             <p>Review your proportionate household budget below.</p>
             <p class="screen-summary">
-                This final report is the result of every detail you've provided. By populating all fields, you now have a rock-solid roadmap for your shared life. You can use these figures to set up your standing orders or joint account contributions, knowing that the math is balanced, fair, and based on your unique relative incomes.
+                This detailed analysis provides a comprehensive roadmap for your joint contributions. By applying your specific split rules to each line item, we've created a balanced financial plan that respects your individual earning power. Use this breakdown to set up joint account standing orders with absolute confidence.
             </p>
 
             <div class="result-ratio-bar" id="result-ratio-bar">
@@ -588,7 +593,33 @@
             <div class="workings-container">
                 <h4>Calculation Workings</h4>
                 <div class="calculation-workings" id="calculation-workings">
-                    <!-- Dynamically populated -->
+                    <div class="workings-sections">
+                        <div class="workings-section">
+                            <h5>1. Combined Annual Income & Ratio</h5>
+                            <p><span id="wk-salary-p1">£0</span> + <span id="wk-salary-p2">£0</span> = <strong id="wk-total-salary">£0</strong></p>
+                            <ul>
+                                <li>You: <strong id="wk-p1-perc">0%</strong> share</li>
+                                <li>Your Partner: <strong id="wk-p2-perc">0%</strong> share</li>
+                            </ul>
+                        </div>
+
+                        <div class="workings-section">
+                            <h5>2. Mortgage & Equity Summary</h5>
+                            <p>Property Value: <strong id="wk-property-price">£0</strong></p>
+                            <ul>
+                                <li>Deposit: <strong id="wk-deposit-perc">0%</strong> (<span id="wk-total-equity">£0</span>) split by <strong id="wk-deposit-split-type">Income Ratio</strong></li>
+                                <li>Mortgage Required: <strong id="wk-mortgage-required">£0</strong></li>
+                                <li>Terms: <strong id="wk-interest-rate">0%</strong> over <strong id="wk-mortgage-term">0</strong> years</li>
+                                <li>Monthly Payment: <strong id="wk-monthly-payment">£0</strong></li>
+                                <li>Total Repayment: <strong id="wk-total-repayment">£0</strong> (interest inclusive)</li>
+                            </ul>
+                        </div>
+
+                        <div class="workings-section">
+                            <h5>3. Calculation Application</h5>
+                            <p>Each monthly line item was split using either your <strong>Income Ratio</strong> or <strong>50/50</strong> based on your specific rule choices throughout the form. The mortgage payment is always split by your Income Ratio to ensure long-term fairness.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -659,6 +690,13 @@
             </div>
 
             <p class="help-text breakdown-summary" id="breakdown-summary" style="margin-top: 1rem; border-top: 1px solid var(--color-border); padding-top: 1rem;"></p>
+
+            <div class="nav-group-vertical">
+                <button type="button" id="downloadCSVBtn" class="btn-success btn-block" onclick="downloadCSV()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 1.25rem; height: 1.25rem; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                    Download results as CSV
+                </button>
+            </div>
         </section>
 
         <div class="nav-group">
@@ -679,7 +717,7 @@
     </div>
 </div>
 
-<script src="app.js?v=1771261000"></script>
+<script src="app.js?v=1771261001"></script>
 
 <script>
     if ('serviceWorker' in navigator) {

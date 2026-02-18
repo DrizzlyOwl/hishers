@@ -62,7 +62,6 @@ describe('FairShare App', () => {
     cy.get('[data-cy="insuranceCost-input"]').type('50');
     cy.get('[data-cy="otherSharedCosts-input"]').type('100');
     cy.get('[data-cy="next-button"]').click();
-    cy.get('#screen-7').should('be.visible');
   };
 
   it('should calculate heating estimates correctly for a northern region', () => {
@@ -150,6 +149,8 @@ describe('FairShare App', () => {
     fillStep3();
     fillStep4();
     fillStep5();
+
+    cy.get('#screen-7').should('be.visible');
 
     // Results screen assertions
     cy.get('[data-cy="result-p1"]').should('not.have.text', '£0');

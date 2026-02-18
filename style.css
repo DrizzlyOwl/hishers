@@ -61,7 +61,7 @@ body {
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 2rem;
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 500;
     display: flex;
     align-items: center;
@@ -134,7 +134,7 @@ body {
     top: 0.5rem;
     right: 0.5rem;
     padding: 0.4rem 0.8rem;
-    font-size: 0.65rem;
+    font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     background-color: rgba(255, 255, 255, 0.9);
@@ -151,7 +151,7 @@ body {
     .header-brand button {
         top: 0.75rem;
         right: 0.75rem;
-        font-size: 0.7rem;
+        font-size: 1rem;
     }
 }
 
@@ -204,7 +204,7 @@ h3 { font-size: 1.125rem; margin-top: 1.25rem; color: var(--color-primary); }
     h3 { font-size: var(--font-size-h3); margin-top: 1.5rem; }
 }
 
-p { margin-bottom: 1rem; font-size: 0.9375rem; }
+p { margin-bottom: 1rem; font-size: 1rem; }
 @media (min-width: 768px) {
     p { margin-bottom: 1.25rem; font-size: var(--font-size-base); }
 }
@@ -226,7 +226,7 @@ ol { list-style-type: decimal; }
 
 li {
     margin-bottom: 0.5rem;
-    font-size: 0.9375rem;
+    font-size: 1rem;
 }
 
 @media (min-width: 768px) {
@@ -276,7 +276,7 @@ fieldset {
 .form-label {
     display: block;
     font-weight: 700;
-    font-size: 0.8125rem;
+    font-size: 1rem;
     color: var(--color-primary);
     margin-bottom: 0.5rem;
     text-transform: uppercase;
@@ -284,7 +284,7 @@ fieldset {
 }
 
 @media (min-width: 768px) {
-    .form-label { font-size: 0.875rem; }
+    .form-label { font-size: 1rem; }
 }
 
 /* Normalize Number Inputs */
@@ -361,47 +361,45 @@ input:read-only {
 /* Radio Button Controls */
 .segmented-control {
     display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     margin-bottom: 1rem;
+    background-color: var(--color-input-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    padding: 2px;
 }
 
 .segmented-control label {
     flex: 1;
-    min-width: 4rem;
     text-align: center;
-    padding: 0.6rem 1rem;
-    background-color: var(--color-input-bg);
-    border: 2px solid var(--color-border);
-    border-radius: 2rem; /* Pill Shape */
+    padding: 0.6rem 0.5rem;
     cursor: pointer;
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     color: var(--color-text-light);
-    text-transform: none;
-    letter-spacing: normal;
     margin-bottom: 0;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
+    border-radius: 0.35rem;
+    border: none;
 }
 
 @media (min-width: 768px) {
-    .segmented-control { gap: 0.75rem; }
     .segmented-control label {
-        padding: 0.75rem 1.25rem;
+        padding: 0.75rem 1rem;
         font-size: 1rem;
     }
 }
 
 .segmented-control input[type="radio"]:checked + label {
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
-    color: white;
-    box-shadow: 0 4px 10px rgba(44, 62, 99, 0.2);
+    background-color: white;
+    color: var(--color-primary);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .band-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    display: flex; /* Changed from grid to flex for better segmented look */
+    gap: 2px;
 }
 
 /* Slide Toggle (Switch) */
@@ -429,7 +427,7 @@ input:read-only {
     z-index: 2;
     text-align: center;
     padding: 0.75rem 0.5rem;
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 800;
     cursor: pointer;
     color: var(--color-text-light);
@@ -494,7 +492,7 @@ input:read-only {
     z-index: 2;
     text-align: center;
     padding: 4px 0;
-    font-size: 0.65rem;
+    font-size: 1rem;
     font-weight: 800;
     cursor: pointer;
     color: var(--color-text-light);
@@ -554,13 +552,13 @@ input:read-only {
 
 .master-toggle-label {
     font-weight: 700;
-    font-size: 0.875rem;
+    font-size: 1rem;
     color: var(--color-primary);
 }
 
 /* Typography & Messaging */
 .screen-summary {
-    font-size: 0.9375rem;
+    font-size: 1rem;
     color: var(--color-text-light);
     line-height: 1.5;
     margin-bottom: 1.5rem;
@@ -678,7 +676,7 @@ button {
 .btn-block { width: 100%; margin-top: 1rem; }
 .btn-outline { background-color: white; color: var(--color-primary); border: 1px solid var(--color-primary); padding: 0.5rem 1rem; }
 .btn-addon { background-color: var(--color-primary); color: white; padding: 0 0.75rem; border-radius: 0; }
-.btn-text { background: transparent; color: var(--color-primary); text-decoration: underline; padding: 0.5rem; font-size: 0.875rem; }
+.btn-text { background: transparent; color: var(--color-primary); text-decoration: underline; padding: 0.5rem; font-size: 1rem; }
 
 /* Navigation Layout */
 .nav-group {
@@ -733,7 +731,7 @@ button {
 
 .result-card-label {
     font-weight: 700;
-    font-size: 0.8125rem;
+    font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 0.5rem;
@@ -767,8 +765,8 @@ button {
     .ratio-bar-display { height: 2.5rem; margin: 1.5rem 0; }
 }
 
-.bar-p1 { background-color: var(--color-p1); color: white; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; }
-.bar-p2 { background-color: var(--color-p2); color: white; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; }
+.bar-p1 { background-color: var(--color-p1); color: white; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+.bar-p2 { background-color: var(--color-p2); color: white; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
 
 .summary-cards {
     display: flex;
@@ -787,7 +785,7 @@ button {
 
 .summary-card {
     flex: 1;
-    padding: 0.875rem;
+    padding: 1rem;
     border-radius: 0.75rem;
     text-align: center;
     border: 2px solid var(--color-border);
@@ -822,14 +820,15 @@ button {
     border-radius: 0.75rem;
     overflow: hidden;
     border: 1px solid var(--color-border);
-    font-size: 0.875rem;
+    font-size: 1rem;
 }
 
 @media (min-width: 768px) {
     .data-table { font-size: var(--font-size-base); }
 }
 
-.data-table th, .data-table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--color-border); }
+.data-table th, .data-table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--color-border); text-align: center; }
+.data-table th[scope="row"] { text-align: left; }
 @media (min-width: 768px) {
     .data-table th, .data-table td { padding: 0.6rem 1rem; }
 }
@@ -883,7 +882,7 @@ button {
     transform: translate(-50%, -50%);
     width: 100%;
     text-align: center;
-    font-size: 0.65rem;
+    font-size: 1rem;
     font-weight: 800;
     color: var(--color-primary);
     text-transform: uppercase;
@@ -895,7 +894,7 @@ button {
 }
 
 @media (min-width: 768px) {
-    .progress-text-alt { font-size: 0.75rem; }
+    .progress-text-alt { font-size: 1rem; }
 }
 
 /* --- Lazy Loader --- */
@@ -940,7 +939,7 @@ button {
     color: var(--color-primary);
     text-decoration: none;
     font-weight: 700;
-    font-size: 0.875rem;
+    font-size: 1rem;
     transition: all 0.2s ease;
     background-color: transparent;
 }
@@ -961,7 +960,7 @@ footer {
     text-align: center; 
     margin-top: 2rem; 
     padding-bottom: 2rem;
-    font-size: 0.75rem; 
+    font-size: 1rem; 
     color: var(--color-text-light); 
 }
 
@@ -1001,4 +1000,57 @@ footer a svg {
     color: var(--color-primary);
     z-index: 10000;
     border: 2px solid var(--color-primary);
+}
+
+/* Calculation Workings Section */
+.workings-container {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #F9FAFB;
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
+}
+
+.workings-container h4 {
+    margin-top: 0;
+    margin-bottom: 1.25rem;
+    color: var(--color-primary);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 1rem;
+    letter-spacing: 0.025em;
+}
+
+.workings-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.workings-section h5 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-body);
+}
+
+.workings-section p {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.workings-section ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    font-size: 1rem;
+    color: var(--color-text-light);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.workings-section li strong {
+    color: var(--color-text-body);
 }
