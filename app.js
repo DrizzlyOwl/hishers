@@ -692,11 +692,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const screenConfig = {
             [SCREENS.LANDING]: { back: null, next: () => switchScreen(SCREENS.INCOME), nextText: 'Get Started' },
-            [SCREENS.INCOME]: { back: () => switchScreen(SCREENS.LANDING), next: validateAndNext1 },
-            [SCREENS.PROPERTY]: { back: () => switchScreen(SCREENS.INCOME), next: validateAndNext2 },
-            [SCREENS.MORTGAGE]: { back: () => switchScreen(SCREENS.PROPERTY), next: validateAndNextMortgage },
-            [SCREENS.UTILITIES]: { back: () => switchScreen(SCREENS.MORTGAGE), next: validateAndNext3 },
-            [SCREENS.COMMITTED]: { back: () => switchScreen(SCREENS.UTILITIES), next: validateAndNextCommitted, nextText: 'Calculate' },
+            [SCREENS.INCOME]: { back: () => switchScreen(SCREENS.LANDING), next: () => validateAndNext(SCREENS.INCOME) },
+            [SCREENS.PROPERTY]: { back: () => switchScreen(SCREENS.INCOME), next: () => validateAndNext(SCREENS.PROPERTY) },
+            [SCREENS.MORTGAGE]: { back: () => switchScreen(SCREENS.PROPERTY), next: () => validateAndNext(SCREENS.MORTGAGE) },
+            [SCREENS.UTILITIES]: { back: () => switchScreen(SCREENS.MORTGAGE), next: () => validateAndNext(SCREENS.UTILITIES) },
+            [SCREENS.COMMITTED]: { back: () => switchScreen(SCREENS.UTILITIES), next: () => validateAndNext(SCREENS.COMMITTED), nextText: 'Calculate' },
             [SCREENS.RESULTS]: { back: () => switchScreen(SCREENS.COMMITTED), next: clearCacheAndReload, nextText: 'Start Over' }
         };
 
@@ -791,30 +791,122 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {String} nextScreen - ID of the next screen to navigate to
      * @param {Object} options - Optional callbacks: preValidation (async), globalCheck, onSuccess
      */
-    const validateAndNext = async function(fields, nextScreen, options = {}) {
+const VALIDATION_CONFIG = {
+        [SCREENS.INCOME]: {
+            fields: [
+                { id: 'salaryP1', errorId: 'salaryP1Error', type: 'number', min: 0.01, saveTo: 'salaryP1' },
+                { id: 'salaryP2', errorId: 'salaryP2Error', type: 'number', min: 0.01, saveTo: 'salaryP2' }
+            ],
+            nextScreen: SCREENS.PROPERTY,
+            onSuccess: () => {
+                const total = appData.salaryP1 + appData.salaryP2;
+                if (total > 0) {
+                    appData.ratioP1 = appData.salaryP1 / total;
+                    appData.ratioP2 = appData.salaryP2 / total;
+                }
+            }
+        },
+        [SCREENS.PROPERTY]: {
+            fields: [
+                { id: 'bedrooms', errorId: 'bedroomsError', type: 'number', min: 1, saveTo: 'beds' },
+                { id: 'bathrooms', errorId: 'bathroomsError', type: 'number', min: 1, saveTo: 'baths' }
+            ],
+            nextScreen: SCREENS.MORTGAGE,
+            preValidation: async () => {
+                const propPriceInput = elements.propertyPrice;
+                const postcodeField = elements.postcode;
+                const priceError = elements.propertyPriceError;
+                const postcodeError = elements.postcodeError;
+                
+                priceError.setAttribute('hidden', '');
+                postcodeError.setAttribute('hidden', '');
+
+                let propertyPrice = getVal('propertyPrice');
+                if (propertyPrice <= 0) {
+                    const postcode = postcodeField.value.trim().toUpperCase();
+                    if (!postcode || !isValidPostcode(postcode)) {
+                        if (!postcode) postcodeError.removeAttribute('hidden');
+                        priceError.removeAttribute('hidden');
+                        return false;
+                    } else {
+                        propertyPrice = await getEstimatedPropertyPrice(postcode);
+                        propPriceInput.value = propertyPrice;
+                        updatePropertyPriceDisplay(propertyPrice, true);
+                    }
+                } else {
+                    updatePropertyPriceDisplay(propertyPrice, false);
+                }
+                appData.propertyPrice = propertyPrice;
+                return true;
+            },
+            globalCheck: () => {
+                if (!appData.band) {
+                    elements.taxBandError.removeAttribute('hidden');
+                    return false;
+                }
+                return true;
+            },
+            onSuccess: () => {
+                updateRatioBar();
+                populateEstimates();
+            }
+        },
+        [SCREENS.MORTGAGE]: {
+            fields: [
+                { id: 'depositPercentage', errorId: 'depositPercentageError', type: 'number', min: 0, max: 100 },
+                { id: 'mortgageInterestRate', errorId: 'mortgageInterestRateError', type: 'number', min: 0, saveTo: 'mortgageInterestRate' },
+                { id: 'mortgageTerm', errorId: 'mortgageTermError', type: 'number', min: 1, max: 50, saveTo: 'mortgageTerm' }
+            ],
+            nextScreen: SCREENS.UTILITIES,
+            onSuccess: calculateMonthlyMortgage
+        },
+        [SCREENS.UTILITIES]: {
+            fields: [
+                { id: 'councilTaxCost', errorId: 'councilTaxCostError', type: 'number', min: 0 },
+                { id: 'energyCost', errorId: 'energyCostError', type: 'number', min: 0 },
+                { id: 'waterBill', errorId: 'waterBillError', type: 'number', min: 0, saveTo: 'waterBill' }, 
+                { id: 'broadbandCost', errorId: 'broadbandError', type: 'number', min: 0, saveTo: 'broadbandCost' }
+            ],
+            nextScreen: SCREENS.COMMITTED
+        },
+        [SCREENS.COMMITTED]: {
+            fields: [
+                { id: 'groceriesCost', errorId: 'groceriesError', type: 'number', min: 0, allowEmpty: true, saveTo: 'groceriesCost' },
+                { id: 'childcareCost', errorId: 'childcareError', type: 'number', min: 0, allowEmpty: true, saveTo: 'childcareCost' },
+                { id: 'insuranceCost', errorId: 'insuranceError', type: 'number', min: 0, allowEmpty: true, saveTo: 'insuranceCost' },
+                { id: 'otherSharedCosts', errorId: 'otherError', type: 'number', min: 0, allowEmpty: true, saveTo: 'otherSharedCosts' }
+            ],
+            nextScreen: SCREENS.RESULTS,
+            onSuccess: calculateFinalSplit
+        }
+    };
+
+    const validateAndNext = async (screenId) => {
+        const config = VALIDATION_CONFIG[screenId];
+        if (!config) return;
+
         let isValid = true;
 
-        // Custom pre-validation (e.g. async checks)
-        if (options.preValidation) {
-            const preValid = await options.preValidation();
-            if (!preValid) isValid = false;
+        if (config.preValidation) {
+            if (!await config.preValidation()) isValid = false;
         }
 
-        // Standard Field Validation
-        fields.forEach(field => {
+        config.fields.forEach(field => {
             const el = elements[field.id];
             const errorEl = elements[field.errorId];
-            if (errorEl) errorEl.setAttribute('hidden', ''); // Reset error
+            if (errorEl) errorEl.setAttribute('hidden', '');
 
             let val = el.value;
             let fieldValid = true;
 
             if (field.type === 'number') {
-                val = parseFloat(val);
+                const numVal = getVal(field.id);
                 if (field.allowEmpty && el.value === '') {
                     val = 0;
-                } else if (isNaN(val) || (field.min !== undefined && val < field.min) || (field.max !== undefined && val > field.max)) {
+                } else if (isNaN(numVal) || (field.min !== undefined && numVal < field.min) || (field.max !== undefined && numVal > field.max)) {
                     fieldValid = false;
+                } else {
+                    val = numVal;
                 }
             } else if (field.required && !val.trim()) {
                 fieldValid = false;
@@ -828,102 +920,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Global check (e.g. radio button selection)
-        if (options.globalCheck) {
-            if (!options.globalCheck()) isValid = false;
+        if (config.globalCheck && !config.globalCheck()) {
+            isValid = false;
         }
 
-        if (!isValid) return;
-
-        if (options.onSuccess) options.onSuccess();
-        switchScreen(nextScreen);
+        if (isValid) {
+            if (config.onSuccess) config.onSuccess();
+            switchScreen(config.nextScreen);
+        }
     };
 
-    const validateAndNext1 = () => validateAndNext([
-        { id: 'salaryP1', errorId: 'salaryP1Error', type: 'number', min: 0.01, saveTo: 'salaryP1' },
-        { id: 'salaryP2', errorId: 'salaryP2Error', type: 'number', min: 0.01, saveTo: 'salaryP2' }
-    ], 'screen-3', {
-        onSuccess: () => {
-            const total = appData.salaryP1 + appData.salaryP2;
-            appData.ratioP1 = appData.salaryP1 / total;
-            appData.ratioP2 = appData.salaryP2 / total;
-        }
-    });
-
-    window.checkRegion = checkRegion;
-    window.updatePricePreview = updatePricePreview;
-
-    const validateAndNext2 = () => validateAndNext([
-        { id: 'bedrooms', errorId: 'bedroomsError', type: 'number', min: 1, saveTo: 'beds' },
-        { id: 'bathrooms', errorId: 'bathroomsError', type: 'number', min: 1, saveTo: 'baths' }
-    ], 'screen-4', {
-        preValidation: async () => {
-            const propPriceInput = elements.propertyPrice;
-            const postcodeField = elements.postcode;
-            const priceError = elements.propertyPriceError;
-            const postcodeError = elements.postcodeError;
-            
-            // Reset errors handled here
-            priceError.setAttribute('hidden', '');
-            postcodeError.setAttribute('hidden', '');
-
-            let propertyPrice = parseFloat(propPriceInput.value);
-            if (isNaN(propertyPrice) || propertyPrice <= 0) {
-                const postcode = postcodeField.value.trim().toUpperCase();
-                if (!postcode || !isValidPostcode(postcode)) {
-                    if (!postcode) postcodeError.removeAttribute('hidden');
-                    priceError.removeAttribute('hidden');
-                    return false;
-                } else {
-                    // Try to fetch estimate
-                    propertyPrice = await getEstimatedPropertyPrice(postcode);
-                    propPriceInput.value = propertyPrice;
-                    updatePropertyPriceDisplay(propertyPrice, true);
-                }
-            } else {
-                updatePropertyPriceDisplay(propertyPrice, false);
-            }
-            appData.propertyPrice = propertyPrice;
-            return true;
-        },
-        globalCheck: () => {
-            if (!appData.band) {
-                elements.taxBandError.removeAttribute('hidden');
-                return false;
-            }
-            return true;
-        },
-        onSuccess: () => {
-            updateRatioBar();
-            populateEstimates();
-        }
-    });
-
-    const validateAndNextMortgage = () => validateAndNext([
-        { id: 'depositPercentage', errorId: 'depositPercentageError', type: 'number', min: 0, max: 100 },
-        { id: 'mortgageInterestRate', errorId: 'mortgageInterestRateError', type: 'number', min: 0, saveTo: 'mortgageInterestRate' },
-        { id: 'mortgageTerm', errorId: 'mortgageTermError', type: 'number', min: 1, max: 50, saveTo: 'mortgageTerm' }
-    ], 'screen-5', {
-        onSuccess: () => {
-            calculateMonthlyMortgage();
-        }
-    });
-
-    const validateAndNext3 = () => validateAndNext([
-        { id: 'councilTaxCost', errorId: 'councilTaxCostError', type: 'number', min: 0 },
-        { id: 'energyCost', errorId: 'energyCostError', type: 'number', min: 0 },
-        { id: 'waterBill', errorId: 'waterBillError', type: 'number', min: 0, saveTo: 'waterBill' }, 
-        { id: 'broadbandCost', errorId: 'broadbandError', type: 'number', min: 0, saveTo: 'broadbandCost' }
-    ], 'screen-6');
-
-    const validateAndNextCommitted = () => validateAndNext([
-        { id: 'groceriesCost', errorId: 'groceriesError', type: 'number', min: 0, allowEmpty: true, saveTo: 'groceriesCost' },
-        { id: 'childcareCost', errorId: 'childcareError', type: 'number', min: 0, allowEmpty: true, saveTo: 'childcareCost' },
-        { id: 'insuranceCost', errorId: 'insuranceError', type: 'number', min: 0, allowEmpty: true, saveTo: 'insuranceCost' },
-        { id: 'otherSharedCosts', errorId: 'otherError', type: 'number', min: 0, allowEmpty: true, saveTo: 'otherSharedCosts' }
-    ], 'screen-7', {
-        onSuccess: calculateFinalSplit
-    });
 
     window.calculateFinalSplit = function() {
         const taxVal = getVal('councilTaxCost');
