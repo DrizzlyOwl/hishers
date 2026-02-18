@@ -180,6 +180,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Core Functions ---
 
+    const getVal = (id) => parseFloat(elements[id]?.value) || 0;
+
+    const updateBreakdownRow = (key, total, p1, p2) => {
+        if (elements[`bd${key}Total`]) elements[`bd${key}Total`].innerText = formatCurrency(total, 2);
+        if (elements[`bd${key}P1`]) elements[`bd${key}P1`].innerText = formatCurrency(p1, 2);
+        if (elements[`bd${key}P2`]) elements[`bd${key}P2`].innerText = formatCurrency(p2, 2);
+    };
+
     const formatCurrency = (num, decimals = 0) => {
         return '£' + num.toLocaleString(undefined, {
             minimumFractionDigits: decimals,
