@@ -49,7 +49,7 @@ window.downloadCSV = () => {
 
     let csvContent = "data:text/csv;charset=utf-8,";
     csvContent += "FairShare Bill Splitting Report\n";
-    csvContent += `Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n\n`;
+    csvContent += `Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString('en-GB')}\n\n`;
 
     // 1. Ratio Workings
     csvContent += "1. INCOME RATIO WORKINGS\n";
@@ -220,7 +220,7 @@ window.calculateTieredTax = (price, brackets) => {
     return tax;
 };
 window.formatCurrency = (num, decimals = 0) => {
-    return '£' + num.toLocaleString(undefined, {
+    return '£' + num.toLocaleString('en-GB', {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals
     });
@@ -736,7 +736,7 @@ window.calculateFinalSplit = () => {
     if (breakdownSummaryEl) {
         const mainCosts = mort.p1 + mort.p2 + taxVal + enVal + wtVal;
         const lifestyleCosts = bbVal + grVal + committedTotal;
-        breakdownSummaryEl.innerText = `Out of the £${total.toLocaleString(undefined, {minimumFractionDigits: 2})} total monthly spend, £${mainCosts.toLocaleString(undefined, {minimumFractionDigits: 2})} is dedicated to the property and utilities, while £${lifestyleCosts.toLocaleString(undefined, {minimumFractionDigits: 2})} covers shared lifestyle and committed costs. This report captures all your shared commitments in one place.`;
+        breakdownSummaryEl.innerText = `Out of the £${total.toLocaleString('en-GB', {minimumFractionDigits: 2})} total monthly spend, £${mainCosts.toLocaleString('en-GB', {minimumFractionDigits: 2})} is dedicated to the property and utilities, while £${lifestyleCosts.toLocaleString('en-GB', {minimumFractionDigits: 2})} covers shared lifestyle and committed costs. This report captures all your shared commitments in one place.`;
     }
 
     window.switchScreen('screen-7');
@@ -872,12 +872,22 @@ window.validateAndNext = async (screenId) => {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Lazy Loader Logic
+    // Lazy Loader Logic - Wait for fonts to be ready to avoid FOUT
     const loader = document.querySelector('.lazy-loader');
     if (loader) {
-        setTimeout(() => {
-            loader.setAttribute('hidden', '');
-        }, 500);
+        if (document.fonts) {
+            document.fonts.ready.then(() => {
+                loader.setAttribute('hidden', '');
+            }).catch(() => {
+                // Fallback in case of error
+                loader.setAttribute('hidden', '');
+            });
+        } else {
+            // Fallback for older browsers
+            setTimeout(() => {
+                loader.setAttribute('hidden', '');
+            }, 500);
+        }
     }
     // DOM Elements Cache
     elements.salaryP1 = document.getElementById('salaryP1');
