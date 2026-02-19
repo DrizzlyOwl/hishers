@@ -527,6 +527,12 @@ input[type=number] {
     color: var(--color-primary);
 }
 
+.breakdown-summary {
+    margin-top: 1rem;
+    border-top: 1px solid var(--color-border);
+    padding-top: 1rem;
+}
+
 /* Typography & Messaging */
 .screen-summary {
     font-size: 1rem;
@@ -742,6 +748,19 @@ button, .btn {
     gap: 0.5rem;
     align-items: center;
     margin-top: 2rem;
+}
+
+/* Purchase Costs Component */
+.purchase-costs-box {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: rgba(44, 62, 99, 0.03);
+    border-radius: 0.75rem;
+    border: 1px dashed var(--color-border);
+}
+
+.purchase-costs-box h4 {
+    margin-top: 0;
 }
 
 /* Card Layout Grid */
