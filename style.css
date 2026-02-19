@@ -382,6 +382,13 @@ input[type=number] {
     transition: all 0.2s ease-in-out;
 }
 
+@media (min-width: 768px) {
+    .segmented-control label {
+        width: 48px;
+        padding: 0 12px;
+    }
+}
+
 .segmented-control input[type="radio"] {
     position: absolute;
     opacity: 0;
