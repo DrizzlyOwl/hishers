@@ -17,9 +17,9 @@
     <div class="spinner"></div>
 </div>
 
-<div id="offline-indicator" class="offline-badge" hidden aria-live="polite">
-    <img src="icons/icon-offline.svg" alt="Offline Indicator" width="16" height="16">
-    Working Offline
+<div id="offline-indicator" class="alert alert--info alert--fixed-top" hidden aria-live="polite">
+    <img src="icons/icon-offline.svg" alt="offline icon" class="alert__icon">
+    <div class="alert__text">Working Offline</div>
 </div>
 
 <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -219,9 +219,9 @@
                     <input type="number" id="depositPercentage" class="input-control" value="10" min="0" max="100" required aria-describedby="depositPercentage-help depositPercentage-error" data-cy="depositPercentage-input">
                     <span class="input-addon">%</span>
                 </div>
-                <div id="depositPercentage-error" class="error-text" hidden>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
-                    <span>Please enter a deposit percentage (0-100).</span>
+                <div id="depositPercentage-error" class="alert alert--error" hidden>
+                    <img src="icons/icon-error.svg" alt="error icon" class="alert__icon">
+                    <div class="alert__text">Please enter a deposit percentage (0-100).</div>
                 </div>
                 <div id="depositPercentage-help" class="help-text">The total cash deposit you are both putting down combined.</div>
             </div>
@@ -600,7 +600,10 @@
             <p class="text-center total-bill-row" id="total-bill-row">
                 Total Monthly Bill: <span class="fw-bold total-bill-display" id="total-bill-display" aria-live="polite" data-cy="total-bill-display">£0</span>
             </p>
-            <p class="text-center info-text result-summary" id="result-summary" aria-live="polite"></p>
+            <div id="result-summary" class="alert alert--info result-summary" aria-live="polite" hidden>
+                <img src="icons/icon-info.svg" alt="info icon" class="alert__icon">
+                <div class="alert__text"></div>
+            </div>
 
             <div class="workings-container">
                 <h4>Calculation Workings</h4>
@@ -736,9 +739,9 @@
         if (efficiencyTip) {
             const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
             if (isTouchDevice) {
-                efficiencyTip.style.display = 'none'; // Hide if touch is supported
+                efficiencyTip.setAttribute('hidden', '');
             } else {
-                efficiencyTip.style.display = 'flex'; // Ensure it's visible for non-touch
+                efficiencyTip.removeAttribute('hidden');
             }
         }
     });

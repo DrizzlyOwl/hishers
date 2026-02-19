@@ -562,6 +562,7 @@ window.showWarning = (screenNum, msg) => {
     const warnDiv = document.getElementById(`warning-screen-${screenNum}`);
     if (!warnDiv) return;
     warnDiv.outerHTML = createAlertHTML('warning', 'icon-error.svg', msg, `warning-screen-${screenNum}`);
+    // Re-cache if needed, but since it's outerHTML it replaces itself.
 };
 window.updatePagination = (screenId) => {
     const backButton = elements.backButton;
@@ -704,13 +705,15 @@ window.calculateFinalSplit = () => {
     updateBreakdownRow('Total', total, totalP1, totalP2);
 
     const summaryEl = elements.resultSummary;
-    if (summaryEl) {
+    const summaryText = summaryEl?.querySelector('.alert__text');
+    if (summaryEl && summaryText) {
         const diff = Math.abs(totalP1 - totalP2);
         const moreP = totalP1 > totalP2 ? 'You' : 'Your Partner';
         const lessP = totalP1 > totalP2 ? 'Your Partner' : 'You';
         const verb = moreP === 'You' ? 'pay' : 'pays';
-        if (diff < 0.01) summaryEl.innerText = "Both partners contribute equally based on your selected split rules.";
-        else summaryEl.innerText = `${moreP} ${verb} ${formatCurrency(diff, 2)} more than ${lessP} per month overall.`;
+        summaryEl.removeAttribute('hidden');
+        if (diff < 0.01) summaryText.innerText = "Both partners contribute equally based on your selected split rules.";
+        else summaryText.innerText = `${moreP} ${verb} ${formatCurrency(diff, 2)} more than ${lessP} per month overall.`;
     }
 
     // Update Calculation Workings placeholders
