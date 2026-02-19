@@ -499,20 +499,20 @@ input[type=number] {
     padding: 2px;
     border-radius: 2rem;
     position: relative;
-    width: 7rem; /* Fixed width for mini version */
+    min-width: 7rem; /* Changed from width to min-width */
     border: 1px solid var(--color-border);
 }
 
-.mini-switch input { 
-    position: absolute; 
-    opacity: 0; 
+.mini-switch input {
+    position: absolute;
+    opacity: 0;
 }
 
 .mini-switch label {
     flex: 1;
     z-index: 2;
     text-align: center;
-    padding: 4px 0;
+    padding: 4px 0.75rem; /* Adjusted horizontal padding */
     font-size: 1rem;
     font-weight: 800;
     cursor: pointer;
@@ -520,8 +520,8 @@ input[type=number] {
     transition: color 0.3s ease;
     margin-bottom: 0;
     text-transform: uppercase;
+    box-sizing: content-box; /* Added for padding calculation */
 }
-
 .mini-switch input:checked + label {
     color: white !important;
 }
@@ -977,6 +977,7 @@ button {
     font-size: 1rem;
     transition: all 0.2s ease;
     background-color: transparent;
+    margin-bottom: 1rem; /* Added margin for breathing room */
 }
 
 .link-external:hover {
