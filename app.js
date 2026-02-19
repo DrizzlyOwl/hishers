@@ -193,7 +193,7 @@ window.createAlertHTML = (variant, iconName, text, id = '', hidden = false) => {
     const hiddenAttr = hidden ? 'hidden' : '';
     return `
         <div ${idAttr} class="alert alert--${variant}" ${hiddenAttr}>
-            <span class="alert__icon" style="-webkit-mask-image: url('icons/${iconName}'); mask-image: url('icons/${iconName}');"></span>
+            <span class="alert__icon" style="-webkit-mask-image: url('icons/${iconName}'); mask-image: url('icons/${iconName}');" aria-hidden="true"></span>
             <div class="alert__text">${text}</div>
         </div>
     `;

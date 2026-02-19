@@ -13,8 +13,25 @@
     /* Backgrounds */
     --color-bg-body: #E9EDF0;    /* Soft Slate */
     --color-bg-app: #FFFFFF;     /* Pure White */
-    --color-alert-bg: #e3f2fd;
-    --color-alert-text: #0c5460;
+    
+    /* Semantic Colors */
+    --color-info-bg: #EBF5FF;
+    --color-info-text: #1E429F;
+    --color-info-border: #C3DDFD;
+    --color-info-icon: #3F83F8;
+
+    --color-warning-bg: #FFFBEB;
+    --color-warning-text: #92400E;
+    --color-warning-border: #FDE68A;
+    --color-warning-icon: #F59E0B;
+
+    --color-error-bg: #FEF2F2;
+    --color-error-text: #991B1B;
+    --color-error-border: #FEE2E2;
+    --color-error-icon: #EF4444;
+
+    --color-alert-bg: var(--color-info-bg);
+    --color-alert-text: var(--color-info-text);
 
     /* Typography Scale */
     --font-size-base: 1rem;
@@ -607,28 +624,26 @@ input[type=number] {
 
 /* Alert Variants */
 .alert--info {
-    background-color: #EBF5FF;
-    color: #1E429F;
-    border-color: #C3DDFD;
+    background-color: var(--color-info-bg);
+    color: var(--color-info-text);
+    border-color: var(--color-info-border);
 }
+.alert--info .alert__icon { background-color: var(--color-info-icon); }
 
 .alert--warning {
-    background-color: #FFFBEB;
-    color: #92400E;
-    border-color: #FDE68A;
+    background-color: var(--color-warning-bg);
+    color: var(--color-warning-text);
+    border-color: var(--color-warning-border);
 }
+.alert--warning .alert__icon { background-color: var(--color-warning-icon); }
 
 .alert--error {
-    background-color: #FEF2F2;
-    color: #991B1B;
-    border-color: #FEE2E2;
+    background-color: var(--color-error-bg);
+    color: var(--color-error-text);
+    border-color: var(--color-error-border);
     font-weight: 700;
 }
-
-/* Specific icon colors if they should differ from text */
-.alert--info .alert__icon { background-color: #3F83F8; }
-.alert--warning .alert__icon { background-color: #F59E0B; }
-.alert--error .alert__icon { background-color: #EF4444; }
+.alert--error .alert__icon { background-color: var(--color-error-icon); }
 
 /* Alert Utilities */
 .alert--fixed-top {
