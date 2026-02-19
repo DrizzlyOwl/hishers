@@ -193,7 +193,7 @@ window.createAlertHTML = (variant, iconName, text, id = '', hidden = false) => {
     const hiddenAttr = hidden ? 'hidden' : '';
     return `
         <div ${idAttr} class="alert alert--${variant}" ${hiddenAttr}>
-            <img src="icons/${iconName}" alt="${variant} icon" class="alert__icon">
+            <span class="alert__icon" style="-webkit-mask-image: url('icons/${iconName}'); mask-image: url('icons/${iconName}');"></span>
             <div class="alert__text">${text}</div>
         </div>
     `;
@@ -562,7 +562,6 @@ window.showWarning = (screenNum, msg) => {
     const warnDiv = document.getElementById(`warning-screen-${screenNum}`);
     if (!warnDiv) return;
     warnDiv.outerHTML = createAlertHTML('warning', 'icon-error.svg', msg, `warning-screen-${screenNum}`);
-    // Re-cache if needed, but since it's outerHTML it replaces itself.
 };
 window.updatePagination = (screenId) => {
     const backButton = elements.backButton;
