@@ -1040,6 +1040,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (field.id === 'postcode') formatPostcode(el);
             debouncedInput();
         });
+
+        el.addEventListener('blur', () => {
+            // Ensure appData is sync'd before saving on blur
+            let val = el.value;
+            if (field.type === 'number') val = parseFloat(val) || 0;
+            appData[field.key || field.id] = val;
+            saveToCache();
+        });
     });
 
     const estimatePriceBtn = elements.estimatePriceBtn;

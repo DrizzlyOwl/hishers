@@ -146,6 +146,9 @@ describe('FairShare App', () => {
     cy.get('[data-cy="salaryP1-input"]').type('55000');
     cy.get('[data-cy="salaryP2-input"]').type('65000');
 
+    // Wait for debounce to settle before reloading
+    cy.wait(500);
+
     // Reload the page
     cy.reload();
 
