@@ -121,6 +121,7 @@ window.bandPrices = bandPrices;
 
 const CACHE_KEY = 'fairshare_cache';
 window.CACHE_KEY = CACHE_KEY;
+const THEME_KEY = 'fairshare_theme';
 
 const SCREENS = {
     LANDING: 'screen-1',
@@ -132,6 +133,64 @@ const SCREENS = {
     RESULTS: 'screen-7'
 };
 window.SCREENS = SCREENS;
+
+// --- Theme Logic ---
+
+window.initTheme = () => {
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateLogoForTheme(savedTheme);
+    } else {
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const defaultTheme = prefersDark ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', defaultTheme);
+        updateLogoForTheme(defaultTheme);
+    }
+};
+
+const updateLogoForTheme = (theme) => {
+    const logoImg = document.querySelector('.header-brand__logo');
+    if (!logoImg) return;
+    
+    // Cache buster should be maintained if present
+    const currentSrc = logoImg.getAttribute('src');
+    const busterMatch = currentSrc.match(/\?v=\d+/);
+    const buster = busterMatch ? busterMatch[0] : '';
+    
+    if (theme === 'dark') {
+        logoImg.setAttribute('src', `logo-dark.svg${buster}`);
+    } else {
+        logoImg.setAttribute('src', `logo.svg${buster}`);
+    }
+};
+
+const updateBackgroundImage = (screenId) => {
+    const screenToImageMap = {
+        [SCREENS.LANDING]: 'bg-landing.svg',
+        [SCREENS.INCOME]: 'bg-income.svg',
+        [SCREENS.PROPERTY]: 'bg-property.svg',
+        [SCREENS.MORTGAGE]: 'bg-mortgage.svg',
+        [SCREENS.UTILITIES]: 'bg-utilities.svg',
+        [SCREENS.COMMITTED]: 'bg-committed.svg',
+        [SCREENS.RESULTS]: 'bg-results.svg'
+    };
+
+    const newImage = screenToImageMap[screenId];
+    if (newImage) {
+        document.body.style.setProperty('--bg-image', `url('images/${newImage}')`);
+    }
+};
+
+window.toggleTheme = () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const isDark = currentTheme === 'dark' || (!currentTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const newTheme = isDark ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem(THEME_KEY, newTheme);
+    updateLogoForTheme(newTheme);
+};
 
 const TAX_BRACKETS = {
     EN: {
@@ -281,6 +340,21 @@ window.saveToCache = () => {
     localStorage.setItem(CACHE_KEY, JSON.stringify(inputs));
 };
 window.loadFromCache = () => {
+    // 1. Sync appData with whatever is currently in the DOM (defaults from HTML)
+    FORM_FIELDS.forEach(field => {
+        if (elements[field.id]) {
+            const val = elements[field.id].value;
+            const key = field.key || field.id;
+            if (appData.hasOwnProperty(key)) {
+                if (field.type === 'number') {
+                    appData[key] = parseFloat(val) || 0;
+                } else {
+                    appData[key] = val;
+                }
+            }
+        }
+    });
+
     const cached = localStorage.getItem(CACHE_KEY);
     if (!cached) {
         const ftbContainer = document.getElementById('ftb-container');
@@ -309,6 +383,8 @@ window.loadFromCache = () => {
             }
         }
     }
+    
+    // 2. Re-sync appData with the potentially updated values from cache
     FORM_FIELDS.forEach(field => {
         const val = elements[field.id].value;
         const key = field.key || field.id;
@@ -320,6 +396,7 @@ window.loadFromCache = () => {
             }
         }
     });
+
     const total = appData.salaryP1 + appData.salaryP2;
     if (total > 0) {
         appData.ratioP1 = appData.salaryP1 / total;
@@ -502,11 +579,13 @@ window.calculateEquityDetails = () => {
     let legalFees = 1200;
     if (propertyPrice > 500000) legalFees = 1800;
     if (propertyPrice > 1000000) legalFees = 2500;
-    const sdltEl = elements.sdltEstimate;
-    const legalEl = elements.legalFeesEstimate;
-    if (sdltEl) sdltEl.value = sdlt.toLocaleString();
-    if (legalEl) legalEl.value = legalFees.toLocaleString();
-    if (appData.depositSplitProportional) {
+        const sdltEl = elements.sdltEstimate;
+        const legalEl = elements.legalFeesEstimate;
+        if (sdltEl) sdltEl.value = sdlt.toLocaleString();
+        if (legalEl) legalEl.value = legalFees.toLocaleString();
+        if (elements.sdltDisplay) elements.sdltDisplay.innerText = formatCurrency(sdlt);
+        
+        if (appData.depositSplitProportional) {
         appData.equityP1 = appData.totalEquity * appData.ratioP1;
         appData.equityP2 = appData.totalEquity * appData.ratioP2;
     } else {
@@ -615,24 +694,28 @@ window.updatePagination = (screenId) => {
         nextButton.setAttribute('hidden', '');
     }
 };
-window.switchScreen = (id) => {
+window.switchScreen = (id, isInitialLoad = false) => {
     saveToCache();
     const target = document.getElementById(id);
     const heading = target.querySelector('h2');
 
-    // Update URL hash with page-title anchor
-    if (heading && heading.id) {
-        window.location.hash = heading.id;
-    } else {
-        window.location.hash = id;
+    // Update URL hash with page-title anchor only if not initial load
+    if (!isInitialLoad) {
+        if (heading && heading.id) {
+            window.location.hash = heading.id;
+        } else {
+            window.location.hash = id;
+        }
+        if (heading) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     }
 
     document.querySelectorAll('main section').forEach(el => el.setAttribute('hidden', ''));
     target.removeAttribute('hidden');
-    if (heading) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!isInitialLoad) {
+        target.focus();
     }
-    target.focus();
     const progressMap = {
         [SCREENS.LANDING]: { p: 0, text: 'Step 1 of 7: Welcome' },
         [SCREENS.INCOME]: { p: 15, text: 'Step 2 of 7: Income' },
@@ -653,6 +736,10 @@ window.switchScreen = (id) => {
     if (progressLabel) {
         progressLabel.innerText = stepData.text;
     }
+
+    // Update background image
+    updateBackgroundImage(id);
+
     if (id === SCREENS.PROPERTY) hideWarning(3);
     if (id === SCREENS.UTILITIES || id === SCREENS.RESULTS) updateRatioBar();
     const logo = elements.headerBrand.querySelector('.header-brand__logo');
@@ -941,6 +1028,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.postcodeError = document.getElementById('postcode-error');
     elements.regionAnnouncement = document.getElementById('region-announcement');
     elements.sdltEstimate = document.getElementById('sdlt-estimate');
+    elements.sdltDisplay = document.getElementById('sdltDisplay');
     elements.legalFeesEstimate = document.getElementById('legal-fees-estimate');
     elements.totalEquityDisplay = document.getElementById('totalEquityDisplay');
     elements.mortgageRequiredDisplay = document.getElementById('mortgageRequiredDisplay');
@@ -955,6 +1043,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.resultsTable = document.getElementById('results-table');
     elements.displayPropertyPrice = document.getElementById('displayPropertyPrice');
     elements.headerBrand = document.getElementById('header-brand');
+    elements.themeToggle = document.getElementById('theme-toggle');
     elements.salaryP1Error = document.getElementById('salaryP1-error');
     elements.salaryP2Error = document.getElementById('salaryP2-error');
     elements.taxBandError = document.getElementById('taxBand-error');
@@ -1022,6 +1111,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('online', window.updateOnlineStatus);
     window.addEventListener('offline', window.updateOnlineStatus);
     window.updateOnlineStatus();
+
+    if (elements.themeToggle) {
+        elements.themeToggle.addEventListener('click', window.toggleTheme);
+    }
 
     FORM_FIELDS.forEach(field => {
         const el = elements[field.id];
@@ -1104,7 +1197,8 @@ document.addEventListener('DOMContentLoaded', () => {
     loadFromCache();
     calculateEquityDetails();
     calculateMonthlyMortgage();
-    window.switchScreen(SCREENS.LANDING);
+    initTheme();
+    window.switchScreen(SCREENS.LANDING, true);
 
     document.addEventListener('keydown', (e) => {
         const visibleScreen = document.querySelector('main section:not([hidden])');
